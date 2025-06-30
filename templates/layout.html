@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Clinigramm{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <style> body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; } </style>
+</head>
+<body class="text-gray-800">
+    <nav class="bg-gray-800 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <a href="{{ url_for('index') }}" class="flex-shrink-0 flex items-center space-x-2">
+                        <img class="h-8 w-auto" src="{{ url_for('static', filename='img/logo_clinica.png') }}" onerror="this.onerror=null;this.src='https://placehold.co/200x80/ffffff/1f2937?text=CliniGramm';" alt="Logo de la Clínica">
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    {% if session.user_id %}
+                        <!-- Enlaces de Dashboard según el rol -->
+                        {% if session.user_rol == 'admin' %}
+                            <a href="{{ url_for('admin_dashboard') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">Gestión Usuarios</a>
+                            <a href="{{ url_for('pacientes_dashboard') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">Ver Pacientes</a>
+                        {% elif session.user_rol == 'nutriologo' %}
+                             <a href="{{ url_for('pacientes_dashboard') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">Mis Pacientes</a>
+                        {% elif session.user_rol == 'recepcion' %}
+                            <a href="{{ url_for('recepcion_dashboard') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">Recepción</a>
+                        {% endif %}
+                        <a href="{{ url_for('logout') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 bg-red-600">Cerrar Sesión</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="p-4 mb-4 rounded-lg {{ 'bg-green-100 text-green-800' if category == 'success' else ('bg-red-100 text-red-800' if category == 'danger' else 'bg-yellow-100 text-yellow-800') }}" role="alert">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

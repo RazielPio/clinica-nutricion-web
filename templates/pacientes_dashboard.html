@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+{% block title %}Dashboard de Pacientes{% endblock %}
+{% block content %}
+<div class="bg-white p-6 rounded-xl shadow-md">
+    <h2 class="text-2xl font-bold mb-4 text-gray-800">Lista de Pacientes</h2>
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white">
+            <thead class="bg-gray-200">
+                <tr>
+                    <th class="py-3 px-4 text-left">Nombre Completo</th>
+                    <th class="py-3 px-4 text-left">Email</th>
+                    <th class="py-3 px-4 text-left">Teléfono</th>
+                    <th class="py-3 px-4 text-left">Nutriólogo Asignado</th>
+                    <th class="py-3 px-4 text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="text-gray-700">
+                {% for paciente in pacientes %}
+                <tr class="border-b">
+                    <td class="py-3 px-4">{{ paciente.nombre_completo }}</td>
+                    <td class="py-3 px-4">{{ paciente.email or 'N/A' }}</td>
+                    <td class="py-3 px-4">{{ paciente.telefono or 'N/A' }}</td>
+                    <td class="py-3 px-4">{{ paciente.nutriologo_nombre or 'Sin Asignar' }}</td>
+                    <td class="py-3 px-4 text-center">
+                        <a href="{{ url_for('ver_paciente', paciente_id=paciente.id) }}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-3 rounded-lg">
+                            Ver Expediente
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" class="text-center py-4">No hay pacientes registrados.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
