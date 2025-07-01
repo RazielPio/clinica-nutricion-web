@@ -1,28 +1,69 @@
+<!-- ========== templates/ver_paciente.html (Corregido con Logo en PDF) ========== -->
 {% extends "layout.html" %}
+
 {% block title %}Perfil de {{ paciente.nombre_completo }}{% endblock %}
+
 {% block content %}
+<!-- Imagen oculta que se usará para generar el logo en el PDF -->
+<img id="logo-for-pdf" src="{{ url_for('static', filename='img/logo_clinica.png') }}" class="hidden" alt="Logo para PDF">
+
 <div class="space-y-6">
+    <!-- Cabecera del Perfil -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
         <h1 class="text-3xl font-bold text-gray-800">Perfil de: <span class="text-blue-600">{{ paciente.nombre_completo }}</span></h1>
         <div class="flex flex-wrap items-center gap-2 mt-4 md:mt-0">
             {% if session.user_rol in ['admin', 'recepcion'] %}
-            <a href="{{ url_for('reasignar_paciente', paciente_id=paciente.id) }}" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition inline-flex items-center"><svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"></path><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"></path></svg>Reasignar Paciente</a>
+            <a href="{{ url_for('reasignar_paciente', paciente_id=paciente.id) }}" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition inline-flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"></path><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"></path></svg>
+                Reasignar Paciente
+            </a>
             {% endif %}
             {% if session.user_rol in ['nutriologo', 'admin'] %}
-            <a href="{{ url_for('editar_historial_clinico', paciente_id=paciente.id) }}" class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg transition inline-flex items-center"><svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path></svg>Historial Clínico</a>
+            <a href="{{ url_for('editar_historial_clinico', paciente_id=paciente.id) }}" class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg transition inline-flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path></svg>
+                Historial Clínico
+            </a>
             {% endif %}
-            <button id="download-report" class="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded-lg transition inline-flex items-center"><svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>Descargar Reporte</button>
+            <button id="download-report" class="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded-lg transition inline-flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                Descargar Reporte
+            </button>
         </div>
     </div>
+
+    <!-- Contenedor con Pestañas -->
     <div class="bg-white p-6 rounded-xl shadow-lg">
-        <div class="border-b border-gray-200"><nav class="-mb-px flex space-x-8 overflow-x-auto" aria-label="Tabs"><button data-tab="mediciones" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-blue-600 border-blue-500">Mediciones</button><button data-tab="segmental" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 border-transparent">Análisis Segmental</button><button data-tab="detalle_segmental" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 border-transparent">Análisis Detallado</button><button data-tab="info_clinica" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 border-transparent">Info. Clínica</button></nav></div>
+        <div class="border-b border-gray-200">
+            <nav class="-mb-px flex space-x-8 overflow-x-auto" aria-label="Tabs">
+                <button data-tab="mediciones" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-blue-600 border-blue-500">Mediciones</button>
+                <button data-tab="segmental" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 border-transparent">Análisis Segmental</button>
+                <button data-tab="detalle_segmental" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 border-transparent">Análisis Detallado</button>
+                <button data-tab="info_clinica" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 border-transparent">Info. Clínica</button>
+            </nav>
+        </div>
+
+        <!-- Contenido: Mediciones -->
         <div id="tab-content-mediciones" class="tab-content mt-6">
-            <h3 class="text-xl font-semibold text-gray-800 mb-4">Gráficas de Evolución</h3><div class="h-96"><canvas id="evolutionChart"></canvas></div>
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Gráficas de Evolución</h3>
+            <div class="h-96"><canvas id="evolutionChart"></canvas></div>
             <h3 class="text-xl font-semibold text-gray-800 mt-8 mb-4">Tabla de Mediciones</h3>
-            <div class="overflow-x-auto"><table id="measurements-table" class="min-w-full bg-white text-sm"><thead class="bg-gray-100"><tr><th class="p-2 text-left">Fecha</th><th class="p-2 text-left">Peso (kg)</th><th class="p-2 text-left">IMC</th><th class="p-2 text-left">Grasa (%)</th><th class="p-2 text-left">Músculo (%)</th><th class="p-2 text-left">TMB (kcal)</th><th class="p-2 text-left">GET (kcal)</th></tr></thead>
-                <tbody>{% for m in mediciones %}<tr class="border-b"><td class="p-2">{{ m.fecha_medicion.strftime('%d-%m-%Y %H:%M') }}</td><td>{{ m.peso or '-' }}</td><td>{{ m.imc or '-' }}</td><td>{{ m.grasa_corporal_pct or '-' }}</td><td>{{ m.masa_muscular_pct or '-' }}</td><td>{{ m.tmb_kcal or '-' }}</td><td>{{ m.get_kcal or '-' }}</td></tr>{% endfor %}</tbody></table>
+            <div class="overflow-x-auto">
+                <table id="measurements-table" class="min-w-full bg-white text-sm">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="p-2 text-left">Fecha</th><th class="p-2 text-left">Peso (kg)</th><th class="p-2 text-left">IMC</th><th class="p-2 text-left">Grasa (%)</th><th class="p-2 text-left">Músculo (kg)</th><th class="p-2 text-left">Grasa Visceral</th><th class="p-2 text-left">TMB</th><th class="p-2 text-left">GET</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for m in mediciones %}
+                        <tr class="border-b"><td class="p-2">{{ m.fecha_medicion.strftime('%d-%m-%Y %H:%M') }}</td><td>{{ m.peso or '-' }}</td><td>{{ m.imc or '-' }}</td><td>{{ m.grasa_corporal_pct or '-' }}</td><td>{{ m.masa_muscular_kg or '-' }}</td><td>{{ m.grasa_visceral or '-' }}</td><td>{{ m.tmb_kcal or '-' }}</td><td>{{ m.get_kcal or '-' }}</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
+
+        <!-- Contenido: Análisis Segmental -->
         <div id="tab-content-segmental" class="tab-content mt-6 hidden">
             <h3 class="text-xl font-semibold text-gray-800 mb-4">Análisis Segmental de la Última Medición</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -30,65 +71,203 @@
                 <div><h4 class="text-center font-semibold">Grasa Corporal (kg)</h4><div class="h-80"><canvas id="fatChart"></canvas></div></div>
             </div>
             <h3 class="text-xl font-semibold text-gray-800 mt-8 mb-4">Tabla de Datos Segmentales (Última Medición)</h3>
-            <div class="overflow-x-auto"><table id="segmental-table" class="min-w-full bg-white text-sm"><thead class="bg-gray-100"><tr><th class="p-2 text-left">Segmento</th><th class="p-2 text-left">Músculo (kg)</th><th class="p-2 text-left">Grasa (kg)</th></tr></thead>
-                <tbody>{% if mediciones %}<tr><td class="p-2">Tronco</td><td>{{ mediciones[0].musculo_tronco_kg or '-'}}</td><td>{{ mediciones[0].grasa_tronco_kg or '-'}}</td></tr><tr><td class="p-2">Brazo Derecho</td><td>{{ mediciones[0].musculo_brazo_der_kg or '-'}}</td><td>{{ mediciones[0].grasa_brazo_der_kg or '-'}}</td></tr><tr><td class="p-2">Brazo Izquierdo</td><td>{{ mediciones[0].musculo_brazo_izq_kg or '-'}}</td><td>{{ mediciones[0].grasa_brazo_izq_kg or '-'}}</td></tr><tr><td class="p-2">Pierna Derecha</td><td>{{ mediciones[0].musculo_pierna_der_kg or '-'}}</td><td>{{ mediciones[0].grasa_pierna_der_kg or '-'}}</td></tr><tr><td class="p-2">Pierna Izquierda</td><td>{{ mediciones[0].musculo_pierna_izq_kg or '-'}}</td><td>{{ mediciones[0].grasa_pierna_izq_kg or '-'}}</td></tr>{% endif %}</tbody></table>
+            <div class="overflow-x-auto">
+                <table id="segmental-table" class="min-w-full bg-white text-sm">
+                    <thead class="bg-gray-100"><tr><th class="p-2 text-left">Segmento</th><th class="p-2 text-left">Músculo (kg)</th><th class="p-2 text-left">Grasa (kg)</th></tr></thead>
+                    <tbody>
+                        {% if mediciones %}
+                        <tr><td class="p-2">Tronco</td><td>{{ mediciones[0].musculo_tronco_kg or '-'}}</td><td>{{ mediciones[0].grasa_tronco_kg or '-'}}</td></tr>
+                        <tr><td class="p-2">Brazo Derecho</td><td>{{ mediciones[0].musculo_brazo_der_kg or '-'}}</td><td>{{ mediciones[0].grasa_brazo_der_kg or '-'}}</td></tr>
+                        <tr><td class="p-2">Brazo Izquierdo</td><td>{{ mediciones[0].musculo_brazo_izq_kg or '-'}}</td><td>{{ mediciones[0].grasa_brazo_izq_kg or '-'}}</td></tr>
+                        <tr><td class="p-2">Pierna Derecha</td><td>{{ mediciones[0].musculo_pierna_der_kg or '-'}}</td><td>{{ mediciones[0].grasa_pierna_der_kg or '-'}}</td></tr>
+                        <tr><td class="p-2">Pierna Izquierda</td><td>{{ mediciones[0].musculo_pierna_izq_kg or '-'}}</td><td>{{ mediciones[0].grasa_pierna_izq_kg or '-'}}</td></tr>
+                        {% endif %}
+                    </tbody>
+                </table>
             </div>
         </div>
-        <div id="tab-content-detalle_segmental" class="tab-content mt-6 hidden">
-            <!-- El contenido se generará con JavaScript -->
+
+        <!-- Contenido: Análisis Detallado -->
+        <div id="tab-content-detalle_segmental" class="tab-content mt-6 hidden"></div>
+
+        <!-- Contenido: Información Clínica -->
+        <div id="tab-content-info_clinica" class="tab-content mt-6 hidden">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Información Clínica y de Estilo de Vida</h3>
+            <div id="clinical-info-container" class="space-y-4 text-sm"></div>
         </div>
-        <div id="tab-content-info_clinica" class="tab-content mt-6 hidden"><h3 class="text-xl font-semibold text-gray-800 mb-4">Información Clínica y de Estilo de Vida</h3><div id="clinical-info-container" class="space-y-4 text-sm"></div></div>
     </div>
 </div>
+
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const chartData={{ chart_data|tojson }}, mediciones={{ mediciones_json|safe }}, paciente={{ paciente_json|safe }}, historial={{ historial_json|safe }};
-        const ultimaMedicion = mediciones.length > 0 ? mediciones[0] : {};
-        const tabs = document.querySelectorAll('.tab-button'), tabContents = document.querySelectorAll('.tab-content');
-        tabs.forEach(tab => { tab.addEventListener('click', () => { tabs.forEach(t => t.classList.remove('text-blue-600', 'border-blue-500')); tab.classList.add('text-blue-600', 'border-blue-500'); tabContents.forEach(c => c.classList.add('hidden')); document.getElementById(`tab-content-${tab.dataset.tab}`).classList.remove('hidden'); }); });
-        new Chart(document.getElementById('evolutionChart').getContext('2d'), { type: 'line', data: { labels: chartData.labels, datasets: [ { label: 'Peso (kg)', data: chartData.peso, borderColor: 'rgb(59, 130, 246)', tension: 0.1, yAxisID: 'y' }, { label: '% Grasa', data: chartData.grasa, borderColor: 'rgb(239, 68, 68)', tension: 0.1, yAxisID: 'y1' }, { label: 'Músculo (kg)', data: chartData.musculo, borderColor: 'rgb(16, 185, 129)', tension: 0.1, yAxisID: 'y' } ] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { type: 'linear', display: true, position: 'left', title: { display: true, text: 'Kilogramos (kg)' } }, y1: { type: 'linear', display: true, position: 'right', title: { display: true, text: 'Porcentaje (%)' }, grid: { drawOnChartArea: false } } } } });
+document.addEventListener('DOMContentLoaded', function() {
+    // --- Datos iniciales desde Flask ---
+    const chartData = {{ chart_data|tojson }};
+    const mediciones = {{ mediciones_json|safe }};
+    const paciente = {{ paciente_json|safe }};
+    const historial = {{ historial_json|safe }};
+    const ultimaMedicion = mediciones.length > 0 ? mediciones[0] : {};
+
+    // --- Lógica de Pestañas ---
+    const tabs = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => {
+                t.classList.remove('text-blue-600', 'border-blue-500');
+                t.classList.add('text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300', 'border-transparent');
+            });
+            tab.classList.add('text-blue-600', 'border-blue-500');
+            tabContents.forEach(c => c.classList.add('hidden'));
+            document.getElementById(`tab-content-${tab.dataset.tab}`).classList.remove('hidden');
+        });
+    });
+
+    // --- Renderizado de Gráficas ---
+    function renderCharts() {
+        if (document.getElementById('evolutionChart')) {
+            new Chart(document.getElementById('evolutionChart').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [
+                        { label: 'Peso (kg)', data: chartData.peso, borderColor: 'rgb(59, 130, 246)', tension: 0.1, yAxisID: 'y' },
+                        { label: '% Grasa', data: chartData.grasa, borderColor: 'rgb(239, 68, 68)', tension: 0.1, yAxisID: 'y1' },
+                        { label: 'Músculo (kg)', data: chartData.musculo, borderColor: 'rgb(16, 185, 129)', tension: 0.1, yAxisID: 'y' }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { type: 'linear', display: true, position: 'left', title: { display: true, text: 'Kilogramos (kg)' } }, y1: { type: 'linear', display: true, position: 'right', title: { display: true, text: 'Porcentaje (%)' }, grid: { drawOnChartArea: false } } } }
+            });
+        }
+
         const radarLabels = ['Tronco', 'Brazo Derecho', 'Brazo Izquierdo', 'Pierna Derecha', 'Pierna Izquierda'];
         const muscleDataKg = [ultimaMedicion.musculo_tronco_kg, ultimaMedicion.musculo_brazo_der_kg, ultimaMedicion.musculo_brazo_izq_kg, ultimaMedicion.musculo_pierna_der_kg, ultimaMedicion.musculo_pierna_izq_kg];
         const fatDataKg = [ultimaMedicion.grasa_tronco_kg, ultimaMedicion.grasa_brazo_der_kg, ultimaMedicion.grasa_brazo_izq_kg, ultimaMedicion.grasa_pierna_der_kg, ultimaMedicion.grasa_pierna_izq_kg];
-        new Chart(document.getElementById('muscleChart').getContext('2d'), { type: 'radar', data: { labels: radarLabels, datasets: [{ label: 'Músculo (kg)', data: muscleDataKg, fill: true, backgroundColor: 'rgba(59, 130, 246, 0.2)', borderColor: 'rgb(59, 130, 246)', pointBackgroundColor: 'rgb(59, 130, 246)' }] }, options: { responsive: true, maintainAspectRatio: false } });
-        new Chart(document.getElementById('fatChart').getContext('2d'), { type: 'radar', data: { labels: radarLabels, datasets: [{ label: 'Grasa (kg)', data: fatDataKg, fill: true, backgroundColor: 'rgba(239, 68, 68, 0.2)', borderColor: 'rgb(239, 68, 68)', pointBackgroundColor: 'rgb(239, 68, 68)' }] }, options: { responsive: true, maintainAspectRatio: false } });
         
-        function renderDetailedAnalysis() {
-            const container = document.getElementById('tab-content-detalle_segmental');
-            if (mediciones.length < 2) { container.innerHTML = `<p class="text-gray-600">Se necesitan al menos dos mediciones para mostrar un análisis detallado de la evolución.</p>`; return; }
-            const primeraMedicion = mediciones[mediciones.length - 1];
-            const ultimaMedicion = mediciones[0];
-            function createAnalysisTable(medicion, title) {
-                let tableHTML = `<h3 class="text-xl font-semibold text-gray-800 mb-4">${title}</h3><p class="text-sm text-gray-500 mb-2">Peso Corporal Total: ${medicion.peso} kg</p><table class="min-w-full bg-white text-sm mb-8"><thead class="bg-gray-100"><tr><th class="table-cell">Segmento</th><th class="table-cell">Músculo (kg)</th><th class="table-cell">Grasa (kg)</th></tr></thead><tbody>`;
-                const segments = ['tronco', 'brazo_der', 'brazo_izq', 'pierna_der', 'pierna_izq'];
-                segments.forEach(key => { tableHTML += `<tr><td class="table-cell">${key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</td><td class="table-cell">${medicion[`musculo_${key}_kg`] || '-'}</td><td class="table-cell">${medicion[`grasa_${key}_kg`] || '-'}</td></tr>`; });
-                tableHTML += `</tbody></table>`;
-                return tableHTML;
-            }
-            function createEvolutionTable() {
-                let tableHTML = `<h3 class="text-xl font-semibold text-gray-800 mb-4">Evolución Final en Kilogramos por Segmento</h3><table class="min-w-full bg-white text-sm"><thead class="bg-gray-100"><tr><th class="table-cell">Segmento</th><th class="table-cell">Cambio Neto de Músculo (kg)</th><th class="table-cell">Cambio Neto de Grasa (kg)</th></tr></thead><tbody>`;
-                const segments = ['tronco', 'brazo_der', 'brazo_izq', 'pierna_der', 'pierna_izq'];
-                let totalMuscleChange = 0, totalFatChange = 0;
-                segments.forEach(key => { const muscleChange = (ultimaMedicion[`musculo_${key}_kg`] || 0) - (primeraMedicion[`musculo_${key}_kg`] || 0); const fatChange = (ultimaMedicion[`grasa_${key}_kg`] || 0) - (primeraMedicion[`grasa_${key}_kg`] || 0); totalMuscleChange += muscleChange; totalFatChange += fatChange; tableHTML += `<tr><td class="table-cell">${key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</td><td class="table-cell ${muscleChange >= 0 ? 'text-green-600' : 'text-red-600'}">${muscleChange.toFixed(2)} kg</td><td class="table-cell ${fatChange >= 0 ? 'text-red-600' : 'text-green-600'}">${fatChange.toFixed(2)} kg</td></tr>`; });
-                tableHTML += `<tr class="font-bold bg-gray-50"><td class="table-cell">CAMBIO TOTAL</td><td class="table-cell ${totalMuscleChange >= 0 ? 'text-green-600' : 'text-red-600'}">${totalMuscleChange.toFixed(2)} kg</td><td class="table-cell ${totalFatChange >= 0 ? 'text-red-600' : 'text-green-600'}">${totalFatChange.toFixed(2)} kg</td></tr></tbody></table>`;
-                return tableHTML;
-            }
-            container.innerHTML = createAnalysisTable(primeraMedicion, `Análisis Inicial - ${new Date(primeraMedicion.fecha_medicion).toLocaleDateString('es-MX')}`) + createAnalysisTable(ultimaMedicion, `Análisis Reciente - ${new Date(ultimaMedicion.fecha_medicion).toLocaleDateString('es-MX')}`) + createEvolutionTable();
+        if (document.getElementById('muscleChart')) {
+            new Chart(document.getElementById('muscleChart').getContext('2d'), { type: 'radar', data: { labels: radarLabels, datasets: [{ label: 'Músculo (kg)', data: muscleDataKg, fill: true, backgroundColor: 'rgba(59, 130, 246, 0.2)', borderColor: 'rgb(59, 130, 246)', pointBackgroundColor: 'rgb(59, 130, 246)' }] }, options: { responsive: true, maintainAspectRatio: false } });
         }
-        const clinicalContainer = document.getElementById('clinical-info-container'), historialCategorias = { 'Objetivos y Estilo de Vida': { 'Objetivo Principal': historial.objetivo_principal, 'Actividad Diaria': historial.actividad_diaria, 'Tiempo para Entrenar': historial.tiempo_entrenamiento }, 'Historial Médico': { 'Enfermedades y Condiciones': historial.enfermedades_condiciones, 'Alergias': historial.alergias, 'Condiciones Cardiovasculares': historial.condiciones_cardiovasculares, 'Cirugías o Lesiones': historial.cirugias_lesiones, 'Experiencia Deportiva': historial.experiencia_deportiva }, 'Bienestar y Estrés': { 'Estrés Psicológico (1-10)': historial.estres_psicologico, 'Horas de Sueño': historial.horas_sueno, 'Estrés Físico (1-10)': historial.estres_fisico }, 'Suplementos y Fármacos': { 'Medicación Actual': historial.medicacion_actual, 'Uso de Suplementos': historial.suplementos_uso, 'Uso de Farmacología Deportiva': historial.farmacologia_deportiva_uso }, 'Indicadores Dietéticos': { 'Preferencias Alimentarias': historial.preferencias_alimentarias, 'Comidas al Día': historial.num_comidas_dia, 'Alimentos Evitados': historial.alimentos_evitados, 'Alimentos Preferidos': historial.alimentos_preferidos, 'Alimentos No Preferidos': historial.alimentos_no_preferidos } };
-        let clinicalHTML = '';
-        for(const categoria in historialCategorias){ clinicalHTML += `<div class="p-4 border rounded-md"><h4 class="font-semibold text-md mb-2">${categoria}</h4><dl class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">`; for(const item in historialCategorias[categoria]){ clinicalHTML += `<div class="py-1"><dt class="font-medium text-gray-600">${item}</dt><dd class="text-gray-900">${historialCategorias[categoria][item] || 'No registrado'}</dd></div>`; } clinicalHTML += `</dl></div>`; }
-        clinicalContainer.innerHTML = clinicalHTML;
-        renderDetailedAnalysis();
-        document.getElementById('download-report').addEventListener('click', function() {
-            const { jsPDF } = window.jspdf; const doc = new jsPDF();
-            doc.setFontSize(18); doc.text(`Reporte de Paciente: ${paciente.nombre_completo}`, 14, 22);
-            doc.setFontSize(11); doc.setTextColor(100); doc.text(`Generado el: ${new Date().toLocaleDateString('es-MX')}`, 14, 28);
-            doc.autoTable({ startY: 35, head: [['Información Personal', '']], body: [['Email', paciente.email || 'N/A'],['Teléfono', paciente.telefono || 'N/A'],['Fecha de Nacimiento', paciente.fecha_nacimiento ? new Date(paciente.fecha_nacimiento).toLocaleDateString('es-MX') : 'N/A']], theme: 'striped', headStyles: { fillColor: [22, 160, 133] } });
-            doc.autoTable({ html: '#measurements-table', startY: doc.lastAutoTable.finalY + 10, headStyles: { fillColor: [22, 160, 133] } });
-            doc.autoTable({ html: '#segmental-table', startY: doc.lastAutoTable.finalY + 10, headStyles: { fillColor: [22, 160, 133] } });
-            doc.save(`reporte_mediciones_${paciente.nombre_completo.replace(/ /g, '_')}.pdf`);
+        if (document.getElementById('fatChart')) {
+            new Chart(document.getElementById('fatChart').getContext('2d'), { type: 'radar', data: { labels: radarLabels, datasets: [{ label: 'Grasa (kg)', data: fatDataKg, fill: true, backgroundColor: 'rgba(239, 68, 68, 0.2)', borderColor: 'rgb(239, 68, 68)', pointBackgroundColor: 'rgb(239, 68, 68)' }] }, options: { responsive: true, maintainAspectRatio: false } });
+        }
+    }
+
+    // --- Renderizado de Contenido Dinámico ---
+    function renderDetailedAnalysis() {
+        const container = document.getElementById('tab-content-detalle_segmental');
+        if (mediciones.length < 2) {
+            container.innerHTML = `<p class="text-gray-600">Se necesitan al menos dos mediciones para mostrar un análisis detallado de la evolución.</p>`;
+            return;
+        }
+        const primeraMedicion = mediciones[mediciones.length - 1];
+        const ultimaMedicion = mediciones[0];
+
+        function createAnalysisTable(medicion, title) {
+            let tableHTML = `<h3 class="text-xl font-semibold text-gray-800 mb-4">${title}</h3><p class="text-sm text-gray-500 mb-2">Peso Corporal Total: ${medicion.peso} kg</p><table class="min-w-full bg-white text-sm mb-8"><thead class="bg-gray-100"><tr><th class="table-cell">Segmento</th><th class="table-cell">Músculo (kg)</th><th class="table-cell">Grasa (kg)</th></tr></thead><tbody>`;
+            const segments = ['tronco', 'brazo_der', 'brazo_izq', 'pierna_der', 'pierna_izq'];
+            segments.forEach(key => {
+                tableHTML += `<tr><td class="table-cell">${key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</td><td class="table-cell">${medicion[`musculo_${key}_kg`] || '-'}</td><td class="table-cell">${medicion[`grasa_${key}_kg`] || '-'}</td></tr>`;
+            });
+            return tableHTML + `</tbody></table>`;
+        }
+
+        function createEvolutionTable() {
+            let tableHTML = `<h3 class="text-xl font-semibold text-gray-800 mb-4">Evolución Final en Kilogramos por Segmento</h3><table class="min-w-full bg-white text-sm"><thead class="bg-gray-100"><tr><th class="table-cell">Segmento</th><th class="table-cell">Cambio Neto de Músculo (kg)</th><th class="table-cell">Cambio Neto de Grasa (kg)</th></tr></thead><tbody>`;
+            const segments = ['tronco', 'brazo_der', 'brazo_izq', 'pierna_der', 'pierna_izq'];
+            let totalMuscleChange = 0, totalFatChange = 0;
+            segments.forEach(key => {
+                const muscleChange = (ultimaMedicion[`musculo_${key}_kg`] || 0) - (primeraMedicion[`musculo_${key}_kg`] || 0);
+                const fatChange = (ultimaMedicion[`grasa_${key}_kg`] || 0) - (primeraMedicion[`grasa_${key}_kg`] || 0);
+                totalMuscleChange += muscleChange;
+                totalFatChange += fatChange;
+                tableHTML += `<tr><td class="table-cell">${key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</td><td class="table-cell ${muscleChange >= 0 ? 'text-green-600' : 'text-red-600'}">${muscleChange.toFixed(2)} kg</td><td class="table-cell ${fatChange >= 0 ? 'text-red-600' : 'text-green-600'}">${fatChange.toFixed(2)} kg</td></tr>`;
+            });
+            tableHTML += `<tr class="font-bold bg-gray-50"><td class="table-cell">CAMBIO TOTAL</td><td class="table-cell ${totalMuscleChange >= 0 ? 'text-green-600' : 'text-red-600'}">${totalMuscleChange.toFixed(2)} kg</td><td class="table-cell ${totalFatChange >= 0 ? 'text-red-600' : 'text-green-600'}">${totalFatChange.toFixed(2)} kg</td></tr></tbody></table>`;
+            return tableHTML;
+        }
+
+        container.innerHTML = createAnalysisTable(primeraMedicion, `Análisis Inicial - ${new Date(primeraMedicion.fecha_medicion).toLocaleDateString('es-MX')}`) + createAnalysisTable(ultimaMedicion, `Análisis Reciente - ${new Date(ultimaMedicion.fecha_medicion).toLocaleDateString('es-MX')}`) + createEvolutionTable();
+    }
+
+    function renderClinicalInfo() {
+        const container = document.getElementById('clinical-info-container');
+        const categorias = {
+            'Objetivos y Estilo de Vida': { 'Objetivo Principal': historial.objetivo_principal, 'Actividad Diaria': historial.actividad_diaria, 'Tiempo para Entrenar': historial.tiempo_entrenamiento },
+            'Historial Médico': { 'Enfermedades y Condiciones': historial.enfermedades_condiciones, 'Alergias': historial.alergias, 'Condiciones Cardiovasculares': historial.condiciones_cardiovasculares, 'Cirugías o Lesiones': historial.cirugias_lesiones, 'Experiencia Deportiva': historial.experiencia_deportiva },
+            'Bienestar y Estrés': { 'Estrés Psicológico (1-10)': historial.estres_psicologico, 'Horas de Sueño': historial.horas_sueno, 'Estrés Físico (1-10)': historial.estres_fisico },
+            'Suplementos y Fármacos': { 'Medicación Actual': historial.medicacion_actual, 'Uso de Suplementos': historial.suplementos_uso, 'Uso de Farmacología Deportiva': historial.farmacologia_deportiva_uso },
+            'Indicadores Dietéticos': { 'Preferencias Alimentarias': historial.preferencias_alimentarias, 'Comidas al Día': historial.num_comidas_dia, 'Alimentos Evitados': historial.alimentos_evitados, 'Alimentos Preferidos': historial.alimentos_preferidos, 'Alimentos No Preferidos': historial.alimentos_no_preferidos }
+        };
+        let html = '';
+        for (const categoria in categorias) {
+            html += `<div class="p-4 border rounded-md"><h4 class="font-semibold text-md mb-2">${categoria}</h4><dl class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">`;
+            for (const item in categorias[categoria]) {
+                html += `<div class="py-1"><dt class="font-medium text-gray-600">${item}</dt><dd class="text-gray-900">${categorias[categoria][item] || 'No registrado'}</dd></div>`;
+            }
+            html += `</dl></div>`;
+        }
+        container.innerHTML = html;
+    }
+
+    // --- Generación de PDF (Función Actualizada) ---
+    function downloadReport() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const logoImg = document.getElementById('logo-for-pdf');
+
+        const canvas = document.createElement('canvas');
+        canvas.width = logoImg.naturalWidth;
+        canvas.height = logoImg.naturalHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(logoImg, 0, 0, logoImg.naturalWidth, logoImg.naturalHeight);
+        const imgData = canvas.toDataURL('image/png');
+
+        // --- Cabecera del PDF con diseño mejorado ---
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const logoWidth = 50; // Ancho del logo en el PDF
+        const logoHeight = (logoImg.naturalHeight * logoWidth) / logoImg.naturalWidth; // Mantener relación de aspecto
+
+        // Añadir el logo completo
+        doc.addImage(imgData, 'PNG', 14, 15, logoWidth, logoHeight);
+
+        // Añadir el texto del reporte alineado a la derecha
+        doc.setFontSize(18);
+        doc.setTextColor(40); // Color de texto gris oscuro
+        doc.text(`Reporte de Paciente`, pageWidth - 14, 22, { align: 'right' });
+
+        doc.setFontSize(14);
+        doc.text(`${paciente.nombre_completo}`, pageWidth - 14, 29, { align: 'right' });
+
+        doc.setFontSize(10);
+        doc.setTextColor(100); // Color de texto gris más claro
+        doc.text(`Generado el: ${new Date().toLocaleDateString('es-MX')}`, pageWidth - 14, 35, { align: 'right' });
+
+        // Ajustar la posición de inicio de las tablas
+        const startY = Math.max(logoHeight, 35) + 15;
+        const tableHeadStyles = { fillColor: [38, 54, 49] }; // Color verde desaturado
+
+        doc.autoTable({
+            startY: startY,
+            head: [['Información Personal', '']],
+            body: [
+                ['Email', paciente.email || 'N/A'],
+                ['Teléfono', paciente.telefono || 'N/A'],
+                ['Fecha de Nacimiento', paciente.fecha_nacimiento ? new Date(paciente.fecha_nacimiento).toLocaleDateString('es-MX') : 'N/A']
+            ],
+            theme: 'striped',
+            headStyles: tableHeadStyles
         });
-    });
+        
+        doc.autoTable({ html: '#measurements-table', startY: doc.lastAutoTable.finalY + 10, headStyles: tableHeadStyles });
+        doc.autoTable({ html: '#segmental-table', startY: doc.lastAutoTable.finalY + 10, headStyles: tableHeadStyles });
+        
+        doc.save(`reporte_mediciones_${paciente.nombre_completo.replace(/ /g, '_')}.pdf`);
+    }
+    document.getElementById('download-report').addEventListener('click', downloadReport);
+
+    // --- Inicialización ---
+    renderCharts();
+    renderDetailedAnalysis();
+    renderClinicalInfo();
+});
 </script>
 {% endblock %}

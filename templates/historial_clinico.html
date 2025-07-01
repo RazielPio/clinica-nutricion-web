@@ -1,27 +1,58 @@
+<!-- ========== templates/historial_clinico.html ========== -->
 {% extends "layout.html" %}
+
 {% block title %}Historial de {{ paciente.nombre_completo }}{% endblock %}
+
 {% block content %}
 <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg">
     <div class="flex justify-between items-center mb-6">
-        <div><h1 class="text-2xl font-bold text-gray-800">Historial Clínico-Nutricional</h1><p class="text-gray-600">Paciente: {{ paciente.nombre_completo }}</p></div>
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800">Historial Clínico-Nutricional</h1>
+            <p class="text-gray-600">Paciente: {{ paciente.nombre_completo }}</p>
+        </div>
         <a href="{{ url_for('ver_paciente', paciente_id=paciente.id) }}" class="text-sm text-blue-600 hover:underline">&larr; Volver al Expediente</a>
     </div>
+
     <form action="{{ url_for('editar_historial_clinico', paciente_id=paciente.id) }}" method="POST" class="space-y-4">
-        <details class="group border rounded-lg" open><summary class="flex items-center justify-between p-4 cursor-pointer bg-gray-50 rounded-t-lg"><span class="font-semibold">Sección 1: Información Personal</span><svg class="w-5 h-5 transition-transform duration-200 group-open:rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg></summary>
+        
+        <!-- Sección 1: Información Personal -->
+        <details class="group border rounded-lg" open>
+            <summary class="flex items-center justify-between p-4 cursor-pointer bg-gray-50 rounded-t-lg">
+                <span class="font-semibold">Sección 1: Información Personal</span>
+                <svg class="w-5 h-5 transition-transform duration-200 group-open:rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+            </summary>
             <div class="p-4 border-t grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div><label class="block text-sm font-medium">Nombre Completo</label><input type="text" value="{{ paciente.nombre_completo }}" class="mt-1 w-full border-gray-300 rounded-md bg-gray-100" readonly></div>
-                <div><label for="edad" class="block text-sm font-medium">Edad</label><input type="number" name="edad" id="edad" value="{{ historial.edad or '' }}" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div>
-                <div><label for="estatura_cm" class="block text-sm font-medium">Estatura (cm)</label><input type="number" step="0.1" name="estatura_cm" id="estatura_cm" value="{{ historial.estatura_cm or '' }}" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div>
+                <div>
+                    <label class="block text-sm font-medium">Nombre Completo</label>
+                    <input type="text" value="{{ paciente.nombre_completo }}" class="mt-1 w-full border-gray-300 rounded-md bg-gray-100" readonly>
+                </div>
+                <div>
+                    <label for="edad" class="block text-sm font-medium">Edad</label>
+                    <input type="number" name="edad" id="edad" value="{{ historial.edad or '' }}" class="mt-1 w-full border-gray-300 rounded-md shadow-sm">
+                </div>
+                <div>
+                    <label for="estatura_cm" class="block text-sm font-medium">Estatura (cm)</label>
+                    <input type="number" step="0.1" name="estatura_cm" id="estatura_cm" value="{{ historial.estatura_cm or '' }}" class="mt-1 w-full border-gray-300 rounded-md shadow-sm">
+                </div>
             </div>
         </details>
-        <details class="group border rounded-lg"><summary class="flex items-center justify-between p-4 cursor-pointer bg-gray-50"><span class="font-semibold">Sección 2: Objetivos y Estilo de Vida</span><svg class="w-5 h-5 transition-transform duration-200 group-open:rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg></summary>
+
+        <!-- Sección 2: Objetivos y Estilo de Vida -->
+        <details class="group border rounded-lg">
+            <summary class="flex items-center justify-between p-4 cursor-pointer bg-gray-50">
+                <span class="font-semibold">Sección 2: Objetivos y Estilo de Vida</span>
+                <svg class="w-5 h-5 transition-transform duration-200 group-open:rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+            </summary>
             <div class="p-4 border-t space-y-4">
                 <div><label for="objetivo_principal" class="block text-sm font-medium">Objetivo Principal</label><textarea name="objetivo_principal" id="objetivo_principal" rows="3" class="mt-1 w-full border-gray-300 rounded-md shadow-sm">{{ historial.objetivo_principal or '' }}</textarea></div>
                 <div><label for="actividad_diaria" class="block text-sm font-medium">Actividad Diaria (Trabajo, hobbies, etc.)</label><textarea name="actividad_diaria" id="actividad_diaria" rows="3" class="mt-1 w-full border-gray-300 rounded-md shadow-sm">{{ historial.actividad_diaria or '' }}</textarea></div>
                 <div><label for="tiempo_entrenamiento" class="block text-sm font-medium">Tiempo disponible para entrenar (días/horas)</label><input type="text" name="tiempo_entrenamiento" id="tiempo_entrenamiento" value="{{ historial.tiempo_entrenamiento or '' }}" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div>
             </div>
         </details>
-        <details class="group border rounded-lg"><summary class="flex items-center justify-between p-4 cursor-pointer bg-gray-50"><span class="font-semibold">Sección 3: Historial Clínico</span><svg class="w-5 h-5 transition-transform duration-200 group-open:rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg></summary>
+
+        <!-- Sección 3: Historial Clínico -->
+        <details class="group border rounded-lg">
+            <summary class="flex items-center justify-between p-4 cursor-pointer bg-gray-50"><span class="font-semibold">Sección 3: Historial Clínico</span><svg class="w-5 h-5 transition-transform duration-200 group-open:rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg></summary>
             <div class="p-4 border-t space-y-4">
                 <div><label for="enfermedades_condiciones" class="block text-sm font-medium">Enfermedades y Condiciones diagnosticadas</label><textarea name="enfermedades_condiciones" id="enfermedades_condiciones" rows="3" class="mt-1 w-full border-gray-300 rounded-md shadow-sm">{{ historial.enfermedades_condiciones or '' }}</textarea></div>
                 <div><label for="alergias" class="block text-sm font-medium">Alergias (Alimentos, medicamentos, etc.)</label><textarea name="alergias" id="alergias" rows="3" class="mt-1 w-full border-gray-300 rounded-md shadow-sm">{{ historial.alergias or '' }}</textarea></div>
@@ -30,30 +61,49 @@
                 <div><label for="experiencia_deportiva" class="block text-sm font-medium">Experiencia deportiva</label><textarea name="experiencia_deportiva" id="experiencia_deportiva" rows="3" class="mt-1 w-full border-gray-300 rounded-md shadow-sm">{{ historial.experiencia_deportiva or '' }}</textarea></div>
             </div>
         </details>
-        <details class="group border rounded-lg"><summary class="flex items-center justify-between p-4 cursor-pointer bg-gray-50"><span class="font-semibold">Sección 4: Bienestar y Estrés</span><svg class="w-5 h-5 transition-transform duration-200 group-open:rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg></summary>
+
+        <!-- Sección 4: Bienestar y Estrés -->
+        <details class="group border rounded-lg">
+            <summary class="flex items-center justify-between p-4 cursor-pointer bg-gray-50"><span class="font-semibold">Sección 4: Bienestar y Estrés</span><svg class="w-5 h-5 transition-transform duration-200 group-open:rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg></summary>
             <div class="p-4 border-t grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div><label for="estres_psicologico" class="block text-sm font-medium">Nivel de estrés psicológico (1-10)</label><input type="number" name="estres_psicologico" id="estres_psicologico" min="1" max="10" value="{{ historial.estres_psicologico or '' }}" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div>
                 <div><label for="horas_sueno" class="block text-sm font-medium">Horas de sueño</label><input type="number" step="0.5" name="horas_sueno" id="horas_sueno" value="{{ historial.horas_sueno or '' }}" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div>
                 <div><label for="estres_fisico" class="block text-sm font-medium">Nivel de estrés físico (1-10)</label><input type="number" name="estres_fisico" id="estres_fisico" min="1" max="10" value="{{ historial.estres_fisico or '' }}" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div>
             </div>
         </details>
-        <details class="group border rounded-lg"><summary class="flex items-center justify-between p-4 cursor-pointer bg-gray-50"><span class="font-semibold">Sección 5: Suplementación y Fármacos</span><svg class="w-5 h-5 transition-transform duration-200 group-open:rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg></summary>
+
+        <!-- Sección 5: Suplementación y Fármacos -->
+        <details class="group border rounded-lg">
+            <summary class="flex items-center justify-between p-4 cursor-pointer bg-gray-50"><span class="font-semibold">Sección 5: Suplementación y Fármacos</span><svg class="w-5 h-5 transition-transform duration-200 group-open:rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg></summary>
             <div class="p-4 border-t space-y-4">
                 <div><label for="medicacion_actual" class="block text-sm font-medium">Medicación actual</label><textarea name="medicacion_actual" id="medicacion_actual" rows="3" class="mt-1 w-full border-gray-300 rounded-md shadow-sm">{{ historial.medicacion_actual or '' }}</textarea></div>
                 <div><label for="suplementos_uso" class="block text-sm font-medium">Uso de suplementos (actual/pasado)</label><textarea name="suplementos_uso" id="suplementos_uso" rows="3" class="mt-1 w-full border-gray-300 rounded-md shadow-sm">{{ historial.suplementos_uso or '' }}</textarea></div>
                 <div><label for="farmacologia_deportiva_uso" class="block text-sm font-medium">Uso de farmacología deportiva</label><textarea name="farmacologia_deportiva_uso" id="farmacologia_deportiva_uso" rows="3" class="mt-1 w-full border-gray-300 rounded-md shadow-sm">{{ historial.farmacologia_deportiva_uso or '' }}</textarea></div>
             </div>
         </details>
-        <details class="group border rounded-lg"><summary class="flex items-center justify-between p-4 cursor-pointer bg-gray-50"><span class="font-semibold">Sección 6: Indicadores Dietéticos</span><svg class="w-5 h-5 transition-transform duration-200 group-open:rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg></summary>
+
+        <!-- Sección 6: Indicadores Dietéticos -->
+        <details class="group border rounded-lg">
+            <summary class="flex items-center justify-between p-4 cursor-pointer bg-gray-50"><span class="font-semibold">Sección 6: Indicadores Dietéticos</span><svg class="w-5 h-5 transition-transform duration-200 group-open:rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg></summary>
             <div class="p-4 border-t space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div><label for="num_comidas_dia" class="block text-sm font-medium">Número de comidas al día</label><input type="number" name="num_comidas_dia" id="num_comidas_dia" value="{{ historial.num_comidas_dia or '' }}" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div>
                     <div><label for="preferencias_alimentarias" class="block text-sm font-medium">Preferencias alimentarias (vegano, etc.)</label><input type="text" name="preferencias_alimentarias" id="preferencias_alimentarias" value="{{ historial.preferencias_alimentarias or '' }}" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div>
                 </div>
-                <div><label class="block text-sm font-medium mb-2">Frecuencia de consumo</label>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Frecuencia de consumo</label>
                     <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-                        {% set freqs = ['Baja', 'Media', 'Alta', 'Muy Alta'] %}{% for item in ['proteinas', 'verduras', 'cereales', 'azucares', 'lacteos'] %}
-                        <div><label for="frecuencia_{{item}}" class="block text-xs font-medium">{{item|capitalize}}</label><select name="frecuencia_{{item}}" id="frecuencia_{{item}}" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"><option value="" {% if not historial['frecuencia_' + item] %}selected{% endif %}>--</option>{% for freq in freqs %}<option value="{{freq}}" {% if historial['frecuencia_' + item] == freq %}selected{% endif %}>{{freq}}</option>{% endfor %}</select></div>
+                        {% set freqs = ['Baja', 'Media', 'Alta', 'Muy Alta'] %}
+                        {% for item in ['proteinas', 'verduras', 'cereales', 'azucares', 'lacteos'] %}
+                        <div>
+                            <label for="frecuencia_{{item}}" class="block text-xs font-medium">{{item|capitalize}}</label>
+                            <select name="frecuencia_{{item}}" id="frecuencia_{{item}}" class="mt-1 w-full border-gray-300 rounded-md shadow-sm">
+                                <option value="" {% if not historial['frecuencia_' + item] %}selected{% endif %}>--</option>
+                                {% for freq in freqs %}
+                                <option value="{{freq}}" {% if historial['frecuencia_' + item] == freq %}selected{% endif %}>{{freq}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
                         {% endfor %}
                     </div>
                 </div>
@@ -61,10 +111,13 @@
                     <div><label for="alimentos_preferidos" class="block text-sm font-medium">Alimentos Preferidos</label><textarea name="alimentos_preferidos" id="alimentos_preferidos" rows="3" class="mt-1 w-full border-gray-300 rounded-md shadow-sm">{{ historial.alimentos_preferidos or '' }}</textarea></div>
                     <div><label for="alimentos_no_preferidos" class="block text-sm font-medium">Alimentos No Preferidos</label><textarea name="alimentos_no_preferidos" id="alimentos_no_preferidos" rows="3" class="mt-1 w-full border-gray-300 rounded-md shadow-sm">{{ historial.alimentos_no_preferidos or '' }}</textarea></div>
                 </div>
-                 <div><label for="alimentos_evitados" class="block text-sm font-medium">Alimentos evitados y razón</label><textarea name="alimentos_evitados" id="alimentos_evitados" rows="3" class="mt-1 w-full border-gray-300 rounded-md shadow-sm">{{ historial.alimentos_evitados or '' }}</textarea></div>
+                <div><label for="alimentos_evitados" class="block text-sm font-medium">Alimentos evitados y razón</label><textarea name="alimentos_evitados" id="alimentos_evitados" rows="3" class="mt-1 w-full border-gray-300 rounded-md shadow-sm">{{ historial.alimentos_evitados or '' }}</textarea></div>
             </div>
         </details>
-        <div class="flex justify-end pt-4"><button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition">Guardar Historial Clínico</button></div>
+
+        <div class="flex justify-end pt-4">
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition">Guardar Historial Clínico</button>
+        </div>
     </form>
 </div>
 {% endblock %}

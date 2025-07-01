@@ -1,29 +1,41 @@
+<!-- ========== templates/admin_dashboard.html ========== -->
 {% extends "layout.html" %}
+
 {% block title %}Dashboard del Administrador{% endblock %}
+
 {% block content %}
 <div class="space-y-8">
+    <!-- Sección de Gestión de Usuarios -->
     <div class="bg-white p-6 rounded-xl shadow-md">
         <h2 class="text-2xl font-bold mb-4 text-gray-800">Gestión de Usuarios</h2>
         <div class="overflow-x-auto">
             <table class="min-w-full bg-white">
                 <thead class="bg-gray-200">
                     <tr>
-                        <th class="py-3 px-4 text-left">Nombre</th><th class="py-3 px-4 text-left">Email</th><th class="py-3 px-4 text-center">Rol</th><th class="py-3 px-4 text-center">Estado</th><th class="py-3 px-4 text-center">Acciones</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">Nombre</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">Email</th>
+                        <th class="py-3 px-4 text-center text-sm font-semibold text-gray-600">Rol</th>
+                        <th class="py-3 px-4 text-center text-sm font-semibold text-gray-600">Estado</th>
+                        <th class="py-3 px-4 text-center text-sm font-semibold text-gray-600">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="text-gray-700">
                     {% for user in usuarios %}
-                    <tr class="border-b">
+                    <tr class="border-b hover:bg-gray-50">
                         <td class="py-3 px-4">{{ user.nombre }}</td>
                         <td class="py-3 px-4">{{ user.email }}</td>
                         <td class="py-3 px-4 text-center">{{ user.rol|capitalize }}</td>
-                        <td class="py-3 px-4 text-center"><span class="text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full {{ 'bg-green-100 text-green-800' if user.estado == 'activo' else 'bg-red-100 text-red-800' }}">{{ user.estado|capitalize }}</span></td>
+                        <td class="py-3 px-4 text-center">
+                            <span class="text-xs font-medium px-2.5 py-0.5 rounded-full {{ 'bg-green-100 text-green-800' if user.estado == 'activo' else 'bg-red-100 text-red-800' }}">
+                                {{ user.estado|capitalize }}
+                            </span>
+                        </td>
                         <td class="py-3 px-4 text-center">
                             <form method="POST" class="inline-block">
                                 {% if user.estado == 'activo' %}
-                                <button formaction="{{ url_for('update_user_status', user_id=user.id, new_status='inactivo') }}" class="bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-bold py-1 px-3 rounded-lg">Desactivar</button>
+                                <button formaction="{{ url_for('update_user_status', user_id=user.id, new_status='inactivo') }}" class="bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-bold py-1 px-3 rounded-lg transition">Desactivar</button>
                                 {% else %}
-                                <button formaction="{{ url_for('update_user_status', user_id=user.id, new_status='activo') }}" class="bg-green-500 hover:bg-green-600 text-white text-sm font-bold py-1 px-3 rounded-lg">Activar</button>
+                                <button formaction="{{ url_for('update_user_status', user_id=user.id, new_status='activo') }}" class="bg-green-500 hover:bg-green-600 text-white text-sm font-bold py-1 px-3 rounded-lg transition">Activar</button>
                                 {% endif %}
                             </form>
                         </td>
@@ -33,16 +45,28 @@
             </table>
         </div>
     </div>
+
+    <!-- Sección de Últimos Inicios de Sesión -->
     <div class="bg-white p-6 rounded-xl shadow-md">
         <h2 class="text-2xl font-bold mb-4">Últimos Inicios de Sesión</h2>
         <div class="overflow-x-auto">
             <table class="min-w-full bg-white">
                 <thead class="bg-gray-200">
-                    <tr><th class="py-3 px-4 text-left">Fecha y Hora</th><th class="py-3 px-4 text-left">Usuario</th><th class="py-3 px-4 text-left">Rol</th><th class="py-3 px-4 text-left">Dirección IP</th></tr>
+                    <tr>
+                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">Fecha y Hora</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">Usuario</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">Rol</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">Dirección IP</th>
+                    </tr>
                 </thead>
                 <tbody class="text-gray-700">
                     {% for log in logs %}
-                    <tr class="border-b"><td>{{ log.fecha_hora.strftime('%Y-%m-%d %H:%M:%S') }}</td><td>{{ log.nombre }}</td><td>{{ log.rol }}</td><td>{{ log.ip_address }}</td></tr>
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="py-3 px-4">{{ log.fecha_hora.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td class="py-3 px-4">{{ log.nombre }}</td>
+                        <td class="py-3 px-4">{{ log.rol }}</td>
+                        <td class="py-3 px-4">{{ log.ip_address }}</td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>

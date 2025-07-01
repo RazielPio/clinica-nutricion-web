@@ -1,11 +1,18 @@
+<!-- ========== templates/reasignar_paciente.html ========== -->
 {% extends "layout.html" %}
+
 {% block title %}Reasignar Paciente{% endblock %}
+
 {% block content %}
 <div class="max-w-xl mx-auto bg-white p-6 md:p-8 rounded-xl shadow-lg">
     <div class="flex justify-between items-center mb-6">
-        <div><h1 class="text-2xl font-bold text-gray-800">Reasignar Paciente</h1><p class="text-gray-600">Estás editando a: {{ paciente.nombre_completo }}</p></div>
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800">Reasignar Paciente</h1>
+            <p class="text-gray-600">Estás editando a: <span class="font-semibold">{{ paciente.nombre_completo }}</span></p>
+        </div>
         <a href="{{ url_for('ver_paciente', paciente_id=paciente.id) }}" class="text-sm text-blue-600 hover:underline">&larr; Volver al Expediente</a>
     </div>
+
     <form action="{{ url_for('reasignar_paciente', paciente_id=paciente.id) }}" method="POST">
         <div class="space-y-4">
             <div>
@@ -13,10 +20,18 @@
                 <p class="text-xs text-gray-500 mb-2">Actualmente asignado a: {{ paciente.nutriologo_actual or 'Nadie' }}</p>
                 <select name="id_nutriologo_asignado" id="id_nutriologo_asignado" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500">
                     <option value="">-- Dejar sin Asignar --</option>
-                    {% for nutriologo in nutriologos %}<option value="{{ nutriologo.id }}" {% if paciente.id_nutriologo_asignado == nutriologo.id %}selected{% endif %}>{{ nutriologo.nombre }}</option>{% endfor %}
+                    {% for nutriologo in nutriologos %}
+                    <option value="{{ nutriologo.id }}" {% if paciente.id_nutriologo_asignado == nutriologo.id %}selected{% endif %}>
+                        {{ nutriologo.nombre }}
+                    </option>
+                    {% endfor %}
                 </select>
             </div>
-            <div class="flex justify-end pt-4"><button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded-lg transition">Guardar Cambios</button></div>
+            <div class="flex justify-end pt-4">
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded-lg transition">
+                    Guardar Cambios
+                </button>
+            </div>
         </div>
     </form>
 </div>

@@ -1,1 +1,340 @@
-{% extends "layout.html" %}{% block title %}Recepción{% endblock %}{% block content %}<div class="space-y-6"><h1 class="text-center text-3xl font-bold text-gray-800">Recepción</h1><div class="bg-white p-6 md:p-8 rounded-xl shadow-lg"><div class="border-b border-gray-200"><nav class="-mb-px flex space-x-8" aria-label="Tabs"><button id="tab-existente" class="group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm border-blue-500 text-blue-600"><svg class="text-blue-500 -ml-0.5 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" /></svg><span>Paciente Existente</span></button><button id="tab-nuevo" class="group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"><svg class="text-gray-400 group-hover:text-gray-500 -ml-0.5 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 11a1 1 0 100-2 1 1 0 000 2z" /></svg><span>Paciente Nuevo</span></button></nav></div><div id="content-existente" class="mt-6"><div class="p-4 border border-gray-200 rounded-lg"><h2 class="text-lg font-semibold text-gray-800 mb-2">Acciones para Paciente Existente</h2><div class="space-y-6"><div><label for="search-patient" class="block text-sm font-medium text-gray-700">1. Buscar Paciente por Nombre</label><div class="relative"><input type="text" id="search-patient" placeholder="Escribe para buscar..." class="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" autocomplete="off"><div id="search-results" class="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 shadow-lg hidden"></div></div></div><div id="patient-info" class="hidden p-4 bg-blue-50 border border-blue-200 rounded-lg"><div class="flex justify-between items-center"><div><p><strong>Paciente:</strong> <span id="info-paciente" class="font-semibold text-blue-800"></span></p><p><strong>Nutriólogo:</strong> <span id="info-nutriologo" class="font-semibold text-blue-800"></span></p></div><a id="reassign-button" href="#" class="bg-gray-500 hover:bg-gray-600 text-white text-sm font-bold py-2 px-3 rounded-lg transition">Reasignar</a></div></div><form id="measurement-form" action="{{ url_for('add_measurement') }}" method="POST" class="hidden space-y-8"><input type="hidden" name="id_paciente" id="id_paciente"><div><h3 class="text-lg font-medium leading-6 text-gray-900">2. Introducir Datos de Medición</h3><div class="mt-4 p-4 border-t"><h4 class="font-semibold mb-4">Datos Generales</h4><div class="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-4"><div><label for="peso" class="block text-sm">Peso (kg)</label><input type="number" step="0.01" name="peso" id="form-peso" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label for="altura" class="block text-sm">Altura (m)</label><input type="number" step="0.01" name="altura" id="form-altura" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label for="imc" class="block text-sm">IMC (auto)</label><input type="number" step="0.01" name="imc" id="form-imc" class="mt-1 w-full border-gray-300 rounded-md shadow-sm bg-gray-100" readonly></div><div><label for="grasa_corporal_pct" class="block text-sm">% Grasa Corporal</label><input type="number" step="0.01" name="grasa_corporal_pct" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label for="masa_muscular_pct" class="block text-sm">% Masa Muscular</label><input type="number" step="0.01" name="masa_muscular_pct" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label for="agua_corporal_pct" class="block text-sm">% Agua Corporal</label><input type="number" step="0.01" name="agua_corporal_pct" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label for="masa_osea_kg" class="block text-sm">Masa Ósea (kg)</label><input type="number" step="0.01" name="masa_osea_kg" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label for="tmb_kcal" class="block text-sm">TMB (kcal)</label><input type="number" name="tmb_kcal" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label for="get_kcal" class="block text-sm">GET (kcal)</label><input type="number" name="get_kcal" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div></div></div><div class="mt-6 p-4 border-t"><h4 class="font-semibold mb-4">Análisis Segmental (Ingresar en %)</h4><div class="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-4"><div><label for="grasa_tronco_pct" class="block text-sm">% Grasa Tronco</label><input type="number" step="0.01" name="grasa_tronco_pct" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label for="musculo_tronco_pct" class="block text-sm">% Músculo Tronco</label><input type="number" step="0.01" name="musculo_tronco_pct" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label for="grasa_brazo_der_pct" class="block text-sm">% Grasa Brazo Der.</label><input type="number" step="0.01" name="grasa_brazo_der_pct" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label for="musculo_brazo_der_pct" class="block text-sm">% Músculo Brazo Der.</label><input type="number" step="0.01" name="musculo_brazo_der_pct" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label for="grasa_brazo_izq_pct" class="block text-sm">% Grasa Brazo Izq.</label><input type="number" step="0.01" name="grasa_brazo_izq_pct" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label for="musculo_brazo_izq_pct" class="block text-sm">% Músculo Brazo Izq.</label><input type="number" step="0.01" name="musculo_brazo_izq_pct" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label for="grasa_pierna_der_pct" class="block text-sm">% Grasa Pierna Der.</label><input type="number" step="0.01" name="grasa_pierna_der_pct" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label for="musculo_pierna_der_pct" class="block text-sm">% Músculo Pierna Der.</label><input type="number" step="0.01" name="musculo_pierna_der_pct" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label for="grasa_pierna_izq_pct" class="block text-sm">% Grasa Pierna Izq.</label><input type="number" step="0.01" name="grasa_pierna_izq_pct" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div><div><label for="musculo_pierna_izq_pct" class="block text-sm">% Músculo Pierna Izq.</label><input type="number" step="0.01" name="musculo_pierna_izq_pct" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div></div></div></div><div class="mt-6 flex justify-end"><button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition">Registrar Medición</button></div></form></div></div></div><div id="content-nuevo" class="mt-6 hidden"><h2 class="text-xl font-semibold text-gray-800 mb-4">Registrar Nuevo Paciente</h2><form action="{{ url_for('add_patient') }}" method="POST" class="space-y-4 max-w-lg mx-auto p-4 border border-gray-200 rounded-lg"><div><label for="nombre_completo_nuevo" class="block text-sm">Nombre Completo</label><input type="text" name="nombre_completo" id="nombre_completo_nuevo" class="mt-1 w-full border-gray-300 rounded-md" required></div><div><label for="fecha_nacimiento" class="block text-sm">Fecha de Nacimiento</label><input type="date" name="fecha_nacimiento" class="mt-1 w-full border-gray-300 rounded-md"></div><div><label for="estatura_cm_nuevo" class="block text-sm">Estatura (cm)</label><input type="number" step="0.1" name="estatura_cm" id="estatura_cm_nuevo" class="mt-1 w-full border-gray-300 rounded-md"></div><div><label for="telefono" class="block text-sm">Teléfono</label><input type="tel" name="telefono" class="mt-1 w-full border-gray-300 rounded-md"></div><div><label for="email" class="block text-sm">Correo Electrónico</label><input type="email" name="email" class="mt-1 w-full border-gray-300 rounded-md"></div><div><label for="id_nutriologo_asignado" class="block text-sm font-medium text-gray-700">Asignar a Nutriólogo</label><select name="id_nutriologo_asignado" id="id_nutriologo_asignado" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500"><option value="">-- Sin Asignar --</option>{% for nutriologo in nutriologos %}<option value="{{ nutriologo.id }}">{{ nutriologo.nombre }}</option>{% endfor %}</select></div><button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition">Registrar Paciente</button></form></div></div></div><script>document.addEventListener('DOMContentLoaded', function() { const tabExistente = document.getElementById('tab-existente'), tabNuevo = document.getElementById('tab-nuevo'), contentExistente = document.getElementById('content-existente'), contentNuevo = document.getElementById('content-nuevo'), searchInput = document.getElementById('search-patient'), searchResults = document.getElementById('search-results'), patientInfo = document.getElementById('patient-info'), measurementForm = document.getElementById('measurement-form'), formPeso = document.getElementById('form-peso'), formAltura = document.getElementById('form-altura'), formIMC = document.getElementById('form-imc'); function calcularIMC() { const peso = parseFloat(formPeso.value), altura = parseFloat(formAltura.value); if (peso > 0 && altura > 0) { const imc = peso / (altura * altura); formIMC.value = imc.toFixed(2); } else { formIMC.value = ''; } } formPeso.addEventListener('input', calcularIMC); formAltura.addEventListener('input', calcularIMC); function switchTab(activeTab, inactiveTab, activeContent, inactiveContent) { activeTab.classList.add('text-blue-600', 'border-blue-500'); activeTab.classList.remove('text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300', 'border-transparent'); inactiveTab.classList.remove('text-blue-600', 'border-blue-500'); inactiveTab.classList.add('text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300', 'border-transparent'); activeTab.querySelector('svg').classList.add('text-blue-500'); activeTab.querySelector('svg').classList.remove('text-gray-400', 'group-hover:text-gray-500'); inactiveTab.querySelector('svg').classList.remove('text-blue-500'); inactiveTab.querySelector('svg').classList.add('text-gray-400', 'group-hover:text-gray-500'); activeContent.classList.remove('hidden'); inactiveContent.classList.add('hidden'); } tabExistente.addEventListener('click', () => switchTab(tabExistente, tabNuevo, contentExistente, contentNuevo)); tabNuevo.addEventListener('click', () => switchTab(tabNuevo, tabExistente, contentNuevo, contentExistente)); searchInput.addEventListener('keyup', async function() { const query = this.value; if (query.length < 2) { searchResults.classList.add('hidden'); return; } const response = await fetch(`/api/search_patients?q=${query}`); const patients = await response.json(); searchResults.innerHTML = ''; if (patients.length > 0) { patients.forEach(p => { const a = document.createElement('a'); a.href = '#'; a.className = 'block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer'; a.textContent = p.nombre_completo; a.dataset.patientId = p.id; a.dataset.patientName = p.nombre_completo; a.dataset.nutriologoName = p.nutriologo_nombre || 'No asignado'; a.dataset.estaturaCm = p.estatura_cm; searchResults.appendChild(a); }); } else { searchResults.innerHTML = '<span class="block px-4 py-2 text-sm text-gray-500">No se encontraron pacientes.</span>'; } searchResults.classList.remove('hidden'); }); searchResults.addEventListener('click', function(e) { e.preventDefault(); const target = e.target.closest('a'); if (target) { document.getElementById('info-paciente').textContent = target.dataset.patientName; document.getElementById('info-nutriologo').textContent = target.dataset.nutriologoName; document.getElementById('id_paciente').value = target.dataset.patientId; const reassignButton = document.getElementById('reassign-button'); reassignButton.href = `/paciente/${target.dataset.patientId}/reasignar`; const estaturaCm = target.dataset.estaturaCm; if (estaturaCm && estaturaCm !== 'None') { formAltura.value = (parseFloat(estaturaCm) / 100).toFixed(2); } else { formAltura.value = ''; } calcularIMC(); patientInfo.classList.remove('hidden'); measurementForm.classList.remove('hidden'); searchInput.value = ''; searchResults.classList.add('hidden'); } }); document.addEventListener('click', e => { if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) searchResults.classList.add('hidden'); }); });</script>{% endblock %}
+<!-- ========== templates/recepcion_dashboard.html ========== -->
+{% extends "layout.html" %}
+{% block title %}Recepción{% endblock %}
+{% block content %}
+<div class="space-y-6">
+    <h1 class="text-center text-3xl font-bold text-gray-800">Portal de Recepción</h1>
+    <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg">
+        <!-- Pestañas de Navegación -->
+        <div class="border-b border-gray-200">
+            <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                <button id="tab-existente" class="tab-button group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm border-blue-500 text-blue-600">
+                    <svg class="text-blue-500 -ml-0.5 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" /></svg>
+                    <span>Paciente Existente</span>
+                </button>
+                <button id="tab-nuevo" class="tab-button group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                    <svg class="text-gray-400 group-hover:text-gray-500 -ml-0.5 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 11a1 1 0 100-2 1 1 0 000 2z" /></svg>
+                    <span>Paciente Nuevo</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Contenido Pestaña Paciente Existente -->
+        <div id="content-existente" class="tab-content mt-6">
+            <div class="p-4 border border-gray-200 rounded-lg space-y-6">
+                <div>
+                    <label for="search-patient" class="block text-sm font-medium text-gray-700">1. Buscar Paciente por Nombre</label>
+                    <div class="relative">
+                        <input type="text" id="search-patient" placeholder="Escribe para buscar..." class="mt-1 block w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" autocomplete="off">
+                        <div id="search-results" class="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 shadow-lg hidden"></div>
+                    </div>
+                </div>
+                
+                <div id="patient-info" class="hidden p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p><strong>Paciente:</strong> <span id="info-paciente" class="font-semibold text-blue-800"></span></p>
+                            <p><strong>Nutriólogo:</strong> <span id="info-nutriologo" class="font-semibold text-blue-800"></span></p>
+                        </div>
+                        <a id="reassign-button" href="#" class="bg-gray-500 hover:bg-gray-600 text-white text-sm font-bold py-2 px-3 rounded-lg transition">Reasignar</a>
+                    </div>
+                </div>
+
+                <form id="measurement-form" class="hidden space-y-8">
+                    <input type="hidden" name="id_paciente" id="id_paciente">
+                    <div>
+                        <h3 class="text-lg font-medium leading-6 text-gray-900">2. Introducir Datos de Medición</h3>
+                        <div class="mt-4 p-4 border-t">
+                            <h4 class="font-semibold mb-4">Datos Generales</h4>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-4">
+                                <div><label for="peso" class="block text-sm">Peso (kg)</label><input type="number" step="0.01" name="peso" id="form-peso" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div>
+                                <div><label for="altura" class="block text-sm">Altura (m)</label><input type="number" step="0.01" name="altura" id="form-altura" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div>
+                                <div><label for="imc" class="block text-sm">IMC (auto)</label><input type="number" step="0.01" name="imc" id="form-imc" class="mt-1 w-full border-gray-300 rounded-md shadow-sm bg-gray-100" readonly></div>
+                                <div><label for="grasa_corporal_pct" class="block text-sm">% Grasa Corporal</label><input type="number" step="0.01" name="grasa_corporal_pct" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div>
+                                <div><label for="masa_muscular_pct" class="block text-sm">% Masa Muscular</label><input type="number" step="0.01" name="masa_muscular_pct" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div>
+                                <div><label for="agua_corporal_pct" class="block text-sm">% Agua Corporal</label><input type="number" step="0.01" name="agua_corporal_pct" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div>
+                                <div><label for="masa_osea_kg" class="block text-sm">Masa Ósea (kg)</label><input type="number" step="0.01" name="masa_osea_kg" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div>
+                                <div><label for="tmb_kcal" class="block text-sm">TMB (kcal)</label><input type="number" name="tmb_kcal" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div>
+                                <div><label for="get_kcal" class="block text-sm">GET (kcal)</label><input type="number" name="get_kcal" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div>
+                                <div><label for="grasa_visceral" class="block text-sm">Grasa Visceral</label><input type="number" name="grasa_visceral" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div>
+                            </div>
+                        </div>
+                        <div class="mt-6 p-4 border-t">
+                            <h4 class="font-semibold mb-4">Análisis Segmental (Ingresar en %)</h4>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-4">
+                                <div><label for="grasa_tronco_pct" class="block text-sm">% Grasa Tronco</label><input type="number" step="0.01" name="grasa_tronco_pct" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div>
+                                <div><label for="musculo_tronco_pct" class="block text-sm">% Músculo Tronco</label><input type="number" step="0.01" name="musculo_tronco_pct" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div>
+                                <div><label for="grasa_brazo_der_pct" class="block text-sm">% Grasa Brazo Der.</label><input type="number" step="0.01" name="grasa_brazo_der_pct" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div>
+                                <div><label for="musculo_brazo_der_pct" class="block text-sm">% Músculo Brazo Der.</label><input type="number" step="0.01" name="musculo_brazo_der_pct" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div>
+                                <div><label for="grasa_brazo_izq_pct" class="block text-sm">% Grasa Brazo Izq.</label><input type="number" step="0.01" name="grasa_brazo_izq_pct" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div>
+                                <div><label for="musculo_brazo_izq_pct" class="block text-sm">% Músculo Brazo Izq.</label><input type="number" step="0.01" name="musculo_brazo_izq_pct" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div>
+                                <div><label for="grasa_pierna_der_pct" class="block text-sm">% Grasa Pierna Der.</label><input type="number" step="0.01" name="grasa_pierna_der_pct" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div>
+                                <div><label for="musculo_pierna_der_pct" class="block text-sm">% Músculo Pierna Der.</label><input type="number" step="0.01" name="musculo_pierna_der_pct" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div>
+                                <div><label for="grasa_pierna_izq_pct" class="block text-sm">% Grasa Pierna Izq.</label><input type="number" step="0.01" name="grasa_pierna_izq_pct" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div>
+                                <div><label for="musculo_pierna_izq_pct" class="block text-sm">% Músculo Pierna Izq.</label><input type="number" step="0.01" name="musculo_pierna_izq_pct" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-6 flex justify-end">
+                        <button type="button" id="confirm-button" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition">
+                            Registrar Medición
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Contenido Pestaña Paciente Nuevo -->
+        <div id="content-nuevo" class="tab-content mt-6 hidden">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Registrar Nuevo Paciente</h2>
+            <form action="{{ url_for('add_patient') }}" method="POST" class="space-y-4 max-w-lg mx-auto p-4 border border-gray-200 rounded-lg">
+                <div><label for="nombre_completo_nuevo" class="block text-sm">Nombre Completo</label><input type="text" name="nombre_completo" id="nombre_completo_nuevo" class="mt-1 w-full border-gray-300 rounded-md" required></div>
+                <div><label for="fecha_nacimiento" class="block text-sm">Fecha de Nacimiento</label><input type="date" name="fecha_nacimiento" class="mt-1 w-full border-gray-300 rounded-md"></div>
+                <div><label for="estatura_cm_nuevo" class="block text-sm">Estatura (cm)</label><input type="number" step="0.1" name="estatura_cm" id="estatura_cm_nuevo" class="mt-1 w-full border-gray-300 rounded-md"></div>
+                <div><label for="telefono" class="block text-sm">Teléfono</label><input type="tel" name="telefono" class="mt-1 w-full border-gray-300 rounded-md"></div>
+                <div><label for="email" class="block text-sm">Correo Electrónico</label><input type="email" name="email" class="mt-1 w-full border-gray-300 rounded-md"></div>
+                <div>
+                    <label for="id_nutriologo_asignado" class="block text-sm font-medium text-gray-700">Asignar a Nutriólogo</label>
+                    <select name="id_nutriologo_asignado" id="id_nutriologo_asignado" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500">
+                        <option value="">-- Sin Asignar --</option>
+                        {% for nutriologo in nutriologos %}
+                        <option value="{{ nutriologo.id }}">{{ nutriologo.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition">Registrar Paciente</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmación -->
+<div id="confirmation-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3 text-center">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Confirmar Datos</h3>
+            <div class="mt-2 px-7 py-3">
+                <p class="text-sm text-gray-500">¿Estás seguro de que deseas registrar los siguientes datos?</p>
+                <div id="modal-data" class="mt-4 text-left text-sm"></div>
+            </div>
+            <div class="items-center px-4 py-3">
+                <button id="cancel-modal" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md mr-2 hover:bg-gray-300">Cancelar</button>
+                <button id="submit-modal" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Confirmar y Registrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // --- Elementos del DOM ---
+    const ui = {
+        tabs: {
+            existente: document.getElementById('tab-existente'),
+            nuevo: document.getElementById('tab-nuevo'),
+        },
+        content: {
+            existente: document.getElementById('content-existente'),
+            nuevo: document.getElementById('content-nuevo'),
+        },
+        search: {
+            input: document.getElementById('search-patient'),
+            results: document.getElementById('search-results'),
+        },
+        patientInfo: {
+            container: document.getElementById('patient-info'),
+            name: document.getElementById('info-paciente'),
+            nutriologo: document.getElementById('info-nutriologo'),
+            reassignBtn: document.getElementById('reassign-button'),
+        },
+        measurementForm: {
+            form: document.getElementById('measurement-form'),
+            patientId: document.getElementById('id_paciente'),
+            peso: document.getElementById('form-peso'),
+            altura: document.getElementById('form-altura'),
+            imc: document.getElementById('form-imc'),
+        },
+        modal: {
+            container: document.getElementById('confirmation-modal'),
+            data: document.getElementById('modal-data'),
+            confirmBtn: document.getElementById('confirm-button'),
+            cancelBtn: document.getElementById('cancel-modal'),
+            submitBtn: document.getElementById('submit-modal'),
+        }
+    };
+
+    // --- Lógica de Negocio ---
+
+    /**
+     * Calcula y actualiza el campo IMC basado en el peso y la altura.
+     */
+    function calcularIMC() {
+        const peso = parseFloat(ui.measurementForm.peso.value);
+        const altura = parseFloat(ui.measurementForm.altura.value);
+        if (peso > 0 && altura > 0) {
+            const imc = peso / (altura * altura);
+            ui.measurementForm.imc.value = imc.toFixed(2);
+        } else {
+            ui.measurementForm.imc.value = '';
+        }
+    }
+
+    /**
+     * Cambia la visibilidad y estilos de las pestañas y su contenido.
+     * @param {HTMLElement} activeTab - La pestaña a activar.
+     * @param {HTMLElement} activeContent - El contenido a mostrar.
+     */
+    function switchTab(activeTab, activeContent) {
+        // Ocultar todo primero
+        document.querySelectorAll('.tab-button').forEach(tab => {
+            tab.classList.remove('text-blue-600', 'border-blue-500');
+            tab.classList.add('text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300', 'border-transparent');
+            tab.querySelector('svg').classList.remove('text-blue-500');
+            tab.querySelector('svg').classList.add('text-gray-400', 'group-hover:text-gray-500');
+        });
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+
+        // Mostrar el activo
+        activeTab.classList.add('text-blue-600', 'border-blue-500');
+        activeTab.classList.remove('text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300', 'border-transparent');
+        activeTab.querySelector('svg').classList.add('text-blue-500');
+        activeTab.querySelector('svg').classList.remove('text-gray-400', 'group-hover:text-gray-500');
+        activeContent.classList.remove('hidden');
+    }
+
+    /**
+     * Busca pacientes de forma asíncrona y muestra los resultados.
+     */
+    async function searchPatients() {
+        const query = ui.search.input.value;
+        if (query.length < 2) {
+            ui.search.results.classList.add('hidden');
+            return;
+        }
+        try {
+            const response = await fetch(`/api/search_patients?q=${encodeURIComponent(query)}`);
+            if (!response.ok) throw new Error('Error en la búsqueda');
+            const patients = await response.json();
+            
+            ui.search.results.innerHTML = '';
+            if (patients.length > 0) {
+                patients.forEach(p => {
+                    const a = document.createElement('a');
+                    a.href = '#';
+                    a.className = 'block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer';
+                    a.textContent = p.nombre_completo;
+                    a.dataset.patientId = p.id;
+                    a.dataset.patientName = p.nombre_completo;
+                    a.dataset.nutriologoName = p.nutriologo_nombre || 'No asignado';
+                    a.dataset.estaturaCm = p.estatura_cm;
+                    ui.search.results.appendChild(a);
+                });
+            } else {
+                ui.search.results.innerHTML = '<span class="block px-4 py-2 text-sm text-gray-500">No se encontraron pacientes.</span>';
+            }
+            ui.search.results.classList.remove('hidden');
+        } catch (error) {
+            console.error('Error al buscar pacientes:', error);
+            ui.search.results.innerHTML = '<span class="block px-4 py-2 text-sm text-red-500">Error al buscar.</span>';
+            ui.search.results.classList.remove('hidden');
+        }
+    }
+
+    /**
+     * Selecciona un paciente de los resultados de búsqueda y actualiza la UI.
+     * @param {Event} e - El evento de clic.
+     */
+    function selectPatient(e) {
+        e.preventDefault();
+        const target = e.target.closest('a');
+        if (!target) return;
+
+        ui.patientInfo.name.textContent = target.dataset.patientName;
+        ui.patientInfo.nutriologo.textContent = target.dataset.nutriologoName;
+        ui.measurementForm.patientId.value = target.dataset.patientId;
+        ui.patientInfo.reassignBtn.href = `/paciente/${target.dataset.patientId}/reasignar`;
+
+        const estaturaCm = target.dataset.estaturaCm;
+        if (estaturaCm && estaturaCm !== 'None') {
+            ui.measurementForm.altura.value = (parseFloat(estaturaCm) / 100).toFixed(2);
+        } else {
+            ui.measurementForm.altura.value = '';
+        }
+        
+        calcularIMC();
+        ui.patientInfo.container.classList.remove('hidden');
+        ui.measurementForm.form.classList.remove('hidden');
+        ui.search.input.value = '';
+        ui.search.results.classList.add('hidden');
+    }
+
+    /**
+     * Muestra el modal de confirmación con los datos del formulario.
+     */
+    function showConfirmationModal() {
+        let dataHTML = '<ul class="space-y-1">';
+        const formData = new FormData(ui.measurementForm.form);
+        for (let [key, value] of formData.entries()) {
+            if (value && key !== 'id_paciente') {
+                const label = document.querySelector(`label[for="${key}"]`);
+                dataHTML += `<li><strong>${label ? label.textContent : key}:</strong> ${value}</li>`;
+            }
+        }
+        dataHTML += '</ul>';
+        ui.modal.data.innerHTML = dataHTML;
+        ui.modal.container.classList.remove('hidden');
+    }
+
+    /**
+     * Envía el formulario de mediciones de forma asíncrona.
+     */
+    async function submitMeasurementForm() {
+        const formData = new FormData(ui.measurementForm.form);
+        try {
+            const response = await fetch("{{ url_for('add_measurement') }}", {
+                method: "POST",
+                body: formData
+            });
+            // La redirección se manejará en el backend con Flask
+            // Si la respuesta es exitosa, Flask redirigirá y la página se recargará.
+            if (response.ok && response.redirected) {
+                window.location.href = response.url;
+            } else {
+                // Manejar errores si la respuesta no es OK o no hay redirección
+                // Aquí podrías mostrar un mensaje de error sin recargar la página
+                console.error("Error al registrar la medición.");
+                alert("Hubo un error al registrar la medición. Por favor, inténtalo de nuevo.");
+                ui.modal.container.classList.add('hidden');
+            }
+        } catch (error) {
+            console.error('Error en el envío del formulario:', error);
+            alert("Hubo un error de red. Por favor, inténtalo de nuevo.");
+            ui.modal.container.classList.add('hidden');
+        }
+    }
+
+
+    // --- Asignación de Eventos ---
+    ui.measurementForm.peso.addEventListener('input', calcularIMC);
+    ui.measurementForm.altura.addEventListener('input', calcularIMC);
+
+    ui.tabs.existente.addEventListener('click', () => switchTab(ui.tabs.existente, ui.content.existente));
+    ui.tabs.nuevo.addEventListener('click', () => switchTab(ui.tabs.nuevo, ui.content.nuevo));
+
+    ui.search.input.addEventListener('keyup', searchPatients);
+    ui.search.results.addEventListener('click', selectPatient);
+
+    // Ocultar resultados de búsqueda si se hace clic fuera
+    document.addEventListener('click', e => {
+        if (!ui.search.input.contains(e.target) && !ui.search.results.contains(e.target)) {
+            ui.search.results.classList.add('hidden');
+        }
+    });
+
+    // Eventos del Modal
+    ui.modal.confirmBtn.addEventListener('click', showConfirmationModal);
+    ui.modal.cancelBtn.addEventListener('click', () => ui.modal.container.classList.add('hidden'));
+    ui.modal.submitBtn.addEventListener('click', submitMeasurementForm);
+});
+</script>
+{% endblock %}

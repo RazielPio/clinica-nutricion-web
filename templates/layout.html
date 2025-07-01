@@ -1,53 +1,116 @@
+<!-- ========== templates/layout.html (Corregido y con Diseño Verde Desaturado) ========== -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Clinigramm{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- JavaScript Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
-    <style> body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; } </style>
+    
+    <!-- Custom Styles -->
+    <style> 
+        /* Definición de los nuevos colores personalizados */
+        :root {
+            --brand-color-dark: #263631; /* Verde con 80% menos saturación y 10% menos brillo */
+            --brand-color-dark-hover: #2E423C; /* Versión ligeramente más clara para el hover */
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #fafaf9; /* stone-50 */
+        }
+        /* Estilo para las celdas de tablas generadas dinámicamente */
+        .table-cell { 
+            padding: 8px; 
+            border: 1px solid #e5e7eb; /* gray-200 */
+            text-align: center; 
+        }
+        /* Logo como Marca de Agua en el Fondo */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: url("{{ url_for('static', filename='img/logo_clinica.png') }}");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: 300px;
+            opacity: 0.07;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Clases de utilidad para usar los nuevos colores */
+        .bg-brand-dark { background-color: var(--brand-color-dark); }
+        .hover\:bg-brand-dark-hover:hover { background-color: var(--brand-color-dark-hover); }
+
+    </style>
 </head>
-<body class="text-gray-800">
-    <nav class="bg-gray-800 text-white shadow-lg">
+<body class="text-gray-800 pt-16 pb-20">
+    <!-- Barra de Navegación Principal - Fija y con el nuevo color desaturado -->
+    <nav class="bg-brand-dark text-white shadow-lg fixed top-0 w-full z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center">
-                    <a href="{{ url_for('index') }}" class="flex-shrink-0 flex items-center space-x-2">
-                        <img class="h-8 w-auto" src="{{ url_for('static', filename='img/logo_clinica.png') }}" onerror="this.onerror=null;this.src='https://placehold.co/200x80/ffffff/1f2937?text=CliniGramm';" alt="Logo de la Clínica">
-                    </a>
-                </div>
+            <div class="flex items-center justify-end h-16">
+                <!-- Enlaces de Navegación -->
                 <div class="flex items-center space-x-4">
                     {% if session.user_id %}
-                        <!-- Enlaces de Dashboard según el rol -->
+                        <span class="font-bold text-lg hidden sm:block">Clinigramm</span>
                         {% if session.user_rol == 'admin' %}
-                            <a href="{{ url_for('admin_dashboard') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">Gestión Usuarios</a>
-                            <a href="{{ url_for('pacientes_dashboard') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">Ver Pacientes</a>
+                            <a href="{{ url_for('admin_dashboard') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-brand-dark-hover transition">Gestión Usuarios</a>
+                            <a href="{{ url_for('pacientes_dashboard') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-brand-dark-hover transition">Ver Pacientes</a>
                         {% elif session.user_rol == 'nutriologo' %}
-                             <a href="{{ url_for('pacientes_dashboard') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">Mis Pacientes</a>
+                            <a href="{{ url_for('pacientes_dashboard') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-brand-dark-hover transition">Mis Pacientes</a>
                         {% elif session.user_rol == 'recepcion' %}
-                            <a href="{{ url_for('recepcion_dashboard') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700">Recepción</a>
+                            <a href="{{ url_for('recepcion_dashboard') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-brand-dark-hover transition">Recepción</a>
                         {% endif %}
-                        <a href="{{ url_for('logout') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 bg-red-600">Cerrar Sesión</a>
+                        <a href="{{ url_for('logout') }}" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-red-700 bg-red-600 transition">Cerrar Sesión</a>
                     {% endif %}
                 </div>
             </div>
         </div>
     </nav>
-    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+
+    <!-- Contenido Principal -->
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8 w-full">
+        <!-- Bloque para Mensajes Flash (Alertas) -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="p-4 mb-4 rounded-lg {{ 'bg-green-100 text-green-800' if category == 'success' else ('bg-red-100 text-red-800' if category == 'danger' else 'bg-yellow-100 text-yellow-800') }}" role="alert">{{ message }}</div>
+                    <div class="p-4 mb-4 rounded-lg text-sm {{ 
+                        'bg-green-100 text-green-800' if category == 'success' else 
+                        ('bg-red-100 text-red-800' if category == 'danger' else 
+                         'bg-yellow-100 text-yellow-800') 
+                    }}" role="alert">
+                        {{ message }}
+                    </div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
+        
+        <!-- Bloque de contenido que será reemplazado por las plantillas hijas -->
         {% block content %}{% endblock %}
     </main>
+
+    <!-- Pie de Página (Footer) - Fijo y con el nuevo color desaturado -->
+    <footer class="bg-brand-dark text-white py-4 fixed bottom-0 w-full z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-sm text-gray-300">&copy; <span id="year"></span> Clinigramm. Todos los derechos reservados.</p>
+            <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+        </div>
+    </footer>
 </body>
 </html>
