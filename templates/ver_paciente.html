@@ -1,9 +1,16 @@
-<!-- ========== templates/ver_paciente.html (Corregido con Logo en PDF) ========== -->
+<!-- ========== templates/ver_paciente.html (Código Completo con Tablas Corregidas) ========== -->
 {% extends "layout.html" %}
 
 {% block title %}Perfil de {{ paciente.nombre_completo }}{% endblock %}
 
 {% block content %}
+<!-- Estilo para forzar fuentes que soporten Emojis en el navegador -->
+<style>
+  th {
+    font-family: 'Inter', 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
+  }
+</style>
+
 <!-- Imagen oculta que se usará para generar el logo en el PDF -->
 <img id="logo-for-pdf" src="{{ url_for('static', filename='img/logo_clinica.png') }}" class="hidden" alt="Logo para PDF">
 
@@ -51,12 +58,28 @@
                 <table id="measurements-table" class="min-w-full bg-white text-sm">
                     <thead class="bg-gray-100">
                         <tr>
-                            <th class="p-2 text-left">Fecha</th><th class="p-2 text-left">Peso (kg)</th><th class="p-2 text-left">IMC</th><th class="p-2 text-left">Grasa (%)</th><th class="p-2 text-left">Músculo (kg)</th><th class="p-2 text-left">Grasa Visceral</th><th class="p-2 text-left">TMB</th><th class="p-2 text-left">GET</th>
+                            <th class="p-2 text-left">Fecha</th>
+                            <th class="p-2 text-left">Peso ⚖️ (kg)</th>
+                            <th class="p-2 text-left">IMC</th>
+                            <th class="p-2 text-left">Grasa 🍔 (%)</th>
+                            <th class="p-2 text-left">Músculo 💪 (kg)</th>
+                            <th class="p-2 text-left">Grasa Visceral 🎯</th>
+                            <th class="p-2 text-left">BMR 🔥</th>
+                            <th class="p-2 text-left">AMR ⚡️</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for m in mediciones %}
-                        <tr class="border-b"><td class="p-2">{{ m.fecha_medicion.strftime('%d-%m-%Y %H:%M') }}</td><td>{{ m.peso or '-' }}</td><td>{{ m.imc or '-' }}</td><td>{{ m.grasa_corporal_pct or '-' }}</td><td>{{ m.masa_muscular_kg or '-' }}</td><td>{{ m.grasa_visceral or '-' }}</td><td>{{ m.tmb_kcal or '-' }}</td><td>{{ m.get_kcal or '-' }}</td></tr>
+                        <tr class="border-b">
+                            <td class="p-2">{{ m.fecha_medicion.strftime('%d-%m-%Y %H:%M') }}</td>
+                            <td>{{ m.peso or '-' }}</td>
+                            <td>{{ m.imc or '-' }}</td>
+                            <td>{{ m.grasa_corporal_pct or '-' }}</td>
+                            <td>{{ m.masa_muscular_kg or '-' }}</td>
+                            <td>{{ m.grasa_visceral or '-' }}</td>
+                            <td>{{ m.tmb_kcal or '-' }}</td>
+                            <td>{{ m.get_kcal or '-' }}</td>
+                        </tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -67,20 +90,26 @@
         <div id="tab-content-segmental" class="tab-content mt-6 hidden">
             <h3 class="text-xl font-semibold text-gray-800 mb-4">Análisis Segmental de la Última Medición</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div><h4 class="text-center font-semibold">Masa Muscular (kg)</h4><div class="h-80"><canvas id="muscleChart"></canvas></div></div>
-                <div><h4 class="text-center font-semibold">Grasa Corporal (kg)</h4><div class="h-80"><canvas id="fatChart"></canvas></div></div>
+                <div><h4 class="text-center font-semibold">Masa Muscular 💪 (kg)</h4><div class="h-80"><canvas id="muscleChart"></canvas></div></div>
+                <div><h4 class="text-center font-semibold">Grasa Corporal 🍔 (kg)</h4><div class="h-80"><canvas id="fatChart"></canvas></div></div>
             </div>
             <h3 class="text-xl font-semibold text-gray-800 mt-8 mb-4">Tabla de Datos Segmentales (Última Medición)</h3>
             <div class="overflow-x-auto">
                 <table id="segmental-table" class="min-w-full bg-white text-sm">
-                    <thead class="bg-gray-100"><tr><th class="p-2 text-left">Segmento</th><th class="p-2 text-left">Músculo (kg)</th><th class="p-2 text-left">Grasa (kg)</th></tr></thead>
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="p-2 text-left">Segmento 🔬</th>
+                            <th class="p-2 text-left">Músculo 💪 (kg)</th>
+                            <th class="p-2 text-left">Grasa 🍔 (kg)</th>
+                        </tr>
+                    </thead>
                     <tbody>
                         {% if mediciones %}
-                        <tr><td class="p-2">Tronco</td><td>{{ mediciones[0].musculo_tronco_kg or '-'}}</td><td>{{ mediciones[0].grasa_tronco_kg or '-'}}</td></tr>
-                        <tr><td class="p-2">Brazo Derecho</td><td>{{ mediciones[0].musculo_brazo_der_kg or '-'}}</td><td>{{ mediciones[0].grasa_brazo_der_kg or '-'}}</td></tr>
-                        <tr><td class="p-2">Brazo Izquierdo</td><td>{{ mediciones[0].musculo_brazo_izq_kg or '-'}}</td><td>{{ mediciones[0].grasa_brazo_izq_kg or '-'}}</td></tr>
-                        <tr><td class="p-2">Pierna Derecha</td><td>{{ mediciones[0].musculo_pierna_der_kg or '-'}}</td><td>{{ mediciones[0].grasa_pierna_der_kg or '-'}}</td></tr>
-                        <tr><td class="p-2">Pierna Izquierda</td><td>{{ mediciones[0].musculo_pierna_izq_kg or '-'}}</td><td>{{ mediciones[0].grasa_pierna_izq_kg or '-'}}</td></tr>
+                        <tr><td class="p-2">Tronco 👕</td><td>{{ mediciones[0].musculo_tronco_kg or '-'}}</td><td>{{ mediciones[0].grasa_tronco_kg or '-'}}</td></tr>
+                        <tr><td class="p-2">Brazo Derecho 💪</td><td>{{ mediciones[0].musculo_brazo_der_kg or '-'}}</td><td>{{ mediciones[0].grasa_brazo_der_kg or '-'}}</td></tr>
+                        <tr><td class="p-2">Brazo Izquierdo 💪</td><td>{{ mediciones[0].musculo_brazo_izq_kg or '-'}}</td><td>{{ mediciones[0].grasa_brazo_izq_kg or '-'}}</td></tr>
+                        <tr><td class="p-2">Pierna Derecha 🦵</td><td>{{ mediciones[0].musculo_pierna_der_kg or '-'}}</td><td>{{ mediciones[0].grasa_pierna_der_kg or '-'}}</td></tr>
+                        <tr><td class="p-2">Pierna Izquierda 🦵</td><td>{{ mediciones[0].musculo_pierna_izq_kg or '-'}}</td><td>{{ mediciones[0].grasa_pierna_izq_kg or '-'}}</td></tr>
                         {% endif %}
                     </tbody>
                 </table>
@@ -139,7 +168,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
-        const radarLabels = ['Tronco', 'Brazo Derecho', 'Brazo Izquierdo', 'Pierna Derecha', 'Pierna Izquierda'];
+        const radarLabels = ['Tronco 👕', 'Brazo Derecho 💪', 'Brazo Izquierdo 💪', 'Pierna Derecha 🦵', 'Pierna Izquierda 🦵'];
         const muscleDataKg = [ultimaMedicion.musculo_tronco_kg, ultimaMedicion.musculo_brazo_der_kg, ultimaMedicion.musculo_brazo_izq_kg, ultimaMedicion.musculo_pierna_der_kg, ultimaMedicion.musculo_pierna_izq_kg];
         const fatDataKg = [ultimaMedicion.grasa_tronco_kg, ultimaMedicion.grasa_brazo_der_kg, ultimaMedicion.grasa_brazo_izq_kg, ultimaMedicion.grasa_pierna_der_kg, ultimaMedicion.grasa_pierna_izq_kg];
         
@@ -162,24 +191,26 @@ document.addEventListener('DOMContentLoaded', function() {
         const ultimaMedicion = mediciones[0];
 
         function createAnalysisTable(medicion, title) {
-            let tableHTML = `<h3 class="text-xl font-semibold text-gray-800 mb-4">${title}</h3><p class="text-sm text-gray-500 mb-2">Peso Corporal Total: ${medicion.peso} kg</p><table class="min-w-full bg-white text-sm mb-8"><thead class="bg-gray-100"><tr><th class="table-cell">Segmento</th><th class="table-cell">Músculo (kg)</th><th class="table-cell">Grasa (kg)</th></tr></thead><tbody>`;
+            let tableHTML = `<h3 class="text-xl font-semibold text-gray-800 mb-4">${title}</h3><p class="text-sm text-gray-500 mb-2">Peso Corporal Total: ${medicion.peso} kg</p><table class="min-w-full bg-white text-sm mb-8"><thead class="bg-gray-100"><tr><th class="p-2 text-left">Segmento 🔬</th><th class="p-2 text-left">Músculo 💪 (kg)</th><th class="p-2 text-left">Grasa 🍔 (kg)</th></tr></thead><tbody>`;
             const segments = ['tronco', 'brazo_der', 'brazo_izq', 'pierna_der', 'pierna_izq'];
+            const segmentEmojis = {'tronco': '👕', 'brazo_der': '💪', 'brazo_izq': '💪', 'pierna_der': '🦵', 'pierna_izq': '🦵'};
             segments.forEach(key => {
-                tableHTML += `<tr><td class="table-cell">${key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</td><td class="table-cell">${medicion[`musculo_${key}_kg`] || '-'}</td><td class="table-cell">${medicion[`grasa_${key}_kg`] || '-'}</td></tr>`;
+                tableHTML += `<tr><td class="table-cell">${key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} ${segmentEmojis[key]}</td><td class="table-cell">${medicion[`musculo_${key}_kg`] || '-'}</td><td class="table-cell">${medicion[`grasa_${key}_kg`] || '-'}</td></tr>`;
             });
             return tableHTML + `</tbody></table>`;
         }
 
         function createEvolutionTable() {
-            let tableHTML = `<h3 class="text-xl font-semibold text-gray-800 mb-4">Evolución Final en Kilogramos por Segmento</h3><table class="min-w-full bg-white text-sm"><thead class="bg-gray-100"><tr><th class="table-cell">Segmento</th><th class="table-cell">Cambio Neto de Músculo (kg)</th><th class="table-cell">Cambio Neto de Grasa (kg)</th></tr></thead><tbody>`;
+            let tableHTML = `<h3 class="text-xl font-semibold text-gray-800 mb-4">Evolución Final en Kilogramos por Segmento</h3><table class="min-w-full bg-white text-sm"><thead class="bg-gray-100"><tr><th class="p-2 text-left">Segmento 🔬</th><th class="p-2 text-left">Cambio Neto de Músculo 💪 (kg)</th><th class="p-2 text-left">Cambio Neto de Grasa 🍔 (kg)</th></tr></thead><tbody>`;
             const segments = ['tronco', 'brazo_der', 'brazo_izq', 'pierna_der', 'pierna_izq'];
+            const segmentEmojis = {'tronco': '👕', 'brazo_der': '💪', 'brazo_izq': '💪', 'pierna_der': '🦵', 'pierna_izq': '🦵'};
             let totalMuscleChange = 0, totalFatChange = 0;
             segments.forEach(key => {
                 const muscleChange = (ultimaMedicion[`musculo_${key}_kg`] || 0) - (primeraMedicion[`musculo_${key}_kg`] || 0);
                 const fatChange = (ultimaMedicion[`grasa_${key}_kg`] || 0) - (primeraMedicion[`grasa_${key}_kg`] || 0);
                 totalMuscleChange += muscleChange;
                 totalFatChange += fatChange;
-                tableHTML += `<tr><td class="table-cell">${key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</td><td class="table-cell ${muscleChange >= 0 ? 'text-green-600' : 'text-red-600'}">${muscleChange.toFixed(2)} kg</td><td class="table-cell ${fatChange >= 0 ? 'text-red-600' : 'text-green-600'}">${fatChange.toFixed(2)} kg</td></tr>`;
+                tableHTML += `<tr><td class="table-cell">${key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} ${segmentEmojis[key]}</td><td class="table-cell ${muscleChange >= 0 ? 'text-green-600' : 'text-red-600'}">${muscleChange.toFixed(2)} kg</td><td class="table-cell ${fatChange >= 0 ? 'text-red-600' : 'text-green-600'}">${fatChange.toFixed(2)} kg</td></tr>`;
             });
             tableHTML += `<tr class="font-bold bg-gray-50"><td class="table-cell">CAMBIO TOTAL</td><td class="table-cell ${totalMuscleChange >= 0 ? 'text-green-600' : 'text-red-600'}">${totalMuscleChange.toFixed(2)} kg</td><td class="table-cell ${totalFatChange >= 0 ? 'text-red-600' : 'text-green-600'}">${totalFatChange.toFixed(2)} kg</td></tr></tbody></table>`;
             return tableHTML;
@@ -221,29 +252,46 @@ document.addEventListener('DOMContentLoaded', function() {
         ctx.drawImage(logoImg, 0, 0, logoImg.naturalWidth, logoImg.naturalHeight);
         const imgData = canvas.toDataURL('image/png');
 
-        // --- Cabecera del PDF con diseño mejorado ---
         const pageWidth = doc.internal.pageSize.getWidth();
-        const logoWidth = 50; // Ancho del logo en el PDF
-        const logoHeight = (logoImg.naturalHeight * logoWidth) / logoImg.naturalWidth; // Mantener relación de aspecto
+        const logoWidth = 50;
+        const logoHeight = (logoImg.naturalHeight * logoWidth) / logoImg.naturalWidth;
 
-        // Añadir el logo completo
         doc.addImage(imgData, 'PNG', 14, 15, logoWidth, logoHeight);
 
-        // Añadir el texto del reporte alineado a la derecha
         doc.setFontSize(18);
-        doc.setTextColor(40); // Color de texto gris oscuro
+        doc.setTextColor(40);
         doc.text(`Reporte de Paciente`, pageWidth - 14, 22, { align: 'right' });
 
         doc.setFontSize(14);
         doc.text(`${paciente.nombre_completo}`, pageWidth - 14, 29, { align: 'right' });
 
         doc.setFontSize(10);
-        doc.setTextColor(100); // Color de texto gris más claro
+        doc.setTextColor(100);
         doc.text(`Generado el: ${new Date().toLocaleDateString('es-MX')}`, pageWidth - 14, 35, { align: 'right' });
 
-        // Ajustar la posición de inicio de las tablas
         const startY = Math.max(logoHeight, 35) + 15;
-        const tableHeadStyles = { fillColor: [38, 54, 49] }; // Color verde desaturado
+        const tableHeadStyles = { fillColor: [38, 54, 49], textColor: 255 };
+        const tableMargin = { left: 14, right: 14 };
+
+        // CORRECCIÓN: Definir los encabezados manualmente sin emojis
+        const head1 = [['Fecha', 'Peso (kg)', 'IMC', 'Grasa (%)', 'Músculo (kg)', 'Grasa Visc.', 'BMR', 'AMR']];
+        const body1 = Array.from(document.querySelectorAll('#measurements-table tbody tr')).map(tr => Array.from(tr.querySelectorAll('td')).map(td => td.textContent));
+        
+        const head2 = [['Segmento', 'Músculo (kg)', 'Grasa (kg)']];
+        const body2 = Array.from(document.querySelectorAll('#segmental-table tbody tr')).map(tr => {
+            const cells = Array.from(tr.querySelectorAll('td'));
+            const firstCellText = cells[0].textContent.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF].*/g, '').trim();
+            return [firstCellText, cells[1].textContent, cells[2].textContent];
+        });
+
+        // CORRECCIÓN: Opciones de tabla unificadas para un ancho consistente
+        const commonTableOptions = {
+            headStyles: tableHeadStyles,
+            theme: 'grid',
+            margin: tableMargin,
+            styles: { halign: 'center', fontSize: 9 },
+            columnStyles: { 0: { halign: 'left' } }
+        };
 
         doc.autoTable({
             startY: startY,
@@ -253,12 +301,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 ['Teléfono', paciente.telefono || 'N/A'],
                 ['Fecha de Nacimiento', paciente.fecha_nacimiento ? new Date(paciente.fecha_nacimiento).toLocaleDateString('es-MX') : 'N/A']
             ],
-            theme: 'striped',
-            headStyles: tableHeadStyles
+            theme: 'grid',
+            headStyles: tableHeadStyles,
+            margin: tableMargin
         });
         
-        doc.autoTable({ html: '#measurements-table', startY: doc.lastAutoTable.finalY + 10, headStyles: tableHeadStyles });
-        doc.autoTable({ html: '#segmental-table', startY: doc.lastAutoTable.finalY + 10, headStyles: tableHeadStyles });
+        doc.autoTable({ ...commonTableOptions, head: head1, body: body1, startY: doc.lastAutoTable.finalY + 10 });
+        doc.autoTable({ ...commonTableOptions, head: head2, body: body2, startY: doc.lastAutoTable.finalY + 10 });
         
         doc.save(`reporte_mediciones_${paciente.nombre_completo.replace(/ /g, '_')}.pdf`);
     }

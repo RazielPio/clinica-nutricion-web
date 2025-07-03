@@ -15,31 +15,22 @@ DB_CONFIG = {
     'host': 'localhost',
     'user': 'root',
     'password': '',
-    'database': 'clinigramm_db'
+    'database': 'clinigramm_db2'
 }
 
 # --- Gestión de la Conexión a la Base de Datos ---
 
 def get_db():
-    """
-    Abre una nueva conexión a la base de datos si no existe una para la solicitud actual.
-    La conexión se almacena en el objeto 'g' de Flask, que es único para cada solicitud.
-    """
     if 'db' not in g:
         try:
             g.db = mysql.connector.connect(**DB_CONFIG)
         except Error as e:
-            # Si la conexión falla, se registra el error y se devuelve None.
             app.logger.error(f"Error al conectar a MySQL: {e}")
             g.db = None
     return g.db
 
 @app.teardown_appcontext
 def close_db(e=None):
-    """
-    Cierra la conexión a la base de datos al final de la solicitud para liberar recursos.
-    Esta función se ejecuta automáticamente después de cada solicitud.
-    """
     db = g.pop('db', None)
     if db is not None:
         db.close()
@@ -182,7 +173,6 @@ def add_patient():
     return redirect(url_for('recepcion_dashboard'))
 
 def _calculate_body_composition(form_data, peso):
-    """Función auxiliar para calcular la composición corporal a partir de los datos del formulario."""
     def get_float(name):
         try:
             return float(form_data.get(name))
@@ -193,12 +183,10 @@ def _calculate_body_composition(form_data, peso):
     if not peso:
         return composicion
 
-    # Calcular masa muscular total en kg
     masa_muscular_pct_total = get_float('masa_muscular_pct')
     if masa_muscular_pct_total is not None:
         composicion['masa_muscular_kg'] = round((masa_muscular_pct_total / 100) * peso, 2)
 
-    # Porcentajes de peso por segmento corporal (aproximados)
     segment_weight_percentages = {'tronco': 0.46, 'brazo_der': 0.055, 'brazo_izq': 0.055, 'pierna_der': 0.17, 'pierna_izq': 0.17}
     
     for segment, weight_pct in segment_weight_percentages.items():
@@ -220,35 +208,46 @@ def add_measurement():
         try: return float(request.form.get(name))
         except (ValueError, TypeError): return None
 
-    # Recopilar datos del formulario
-    db_data = {key: request.form.get(key) or None for key in request.form.keys()}
-    db_data['id_paciente'] = int(db_data['id_paciente'])
-    db_data['fecha_medicion'] = datetime.now()
-
-    # Realizar conversiones y cálculos básicos
-    peso = get_float('peso')
-    altura_m = get_float('altura')
-    db_data['peso'] = peso
-    db_data['altura'] = altura_m
+    # CORRECCIÓN: Se leen todos los campos numéricos explícitamente usando get_float
+    db_data = {
+        'id_paciente': int(request.form.get('id_paciente')),
+        'fecha_medicion': datetime.now(),
+        'peso': get_float('peso'),
+        'altura': get_float('altura'),
+        'grasa_corporal_pct': get_float('grasa_corporal_pct'),
+        'masa_muscular_pct': get_float('masa_muscular_pct'),
+        'agua_corporal_pct': get_float('agua_corporal_pct'),
+        'masa_osea_kg': get_float('masa_osea_kg'),
+        'tmb_kcal': get_float('tmb_kcal'),
+        'get_kcal': get_float('get_kcal'),
+        'grasa_visceral': get_float('grasa_visceral'), # <-- El valor ahora es un float correcto
+        'observaciones': request.form.get('observaciones') or None,
+        'grasa_tronco_pct': get_float('grasa_tronco_pct'),
+        'musculo_tronco_pct': get_float('musculo_tronco_pct'),
+        'grasa_brazo_der_pct': get_float('grasa_brazo_der_pct'),
+        'musculo_brazo_der_pct': get_float('musculo_brazo_der_pct'),
+        'grasa_brazo_izq_pct': get_float('grasa_brazo_izq_pct'),
+        'musculo_brazo_izq_pct': get_float('musculo_brazo_izq_pct'),
+        'grasa_pierna_der_pct': get_float('grasa_pierna_der_pct'),
+        'musculo_pierna_der_pct': get_float('musculo_pierna_der_pct'),
+        'grasa_pierna_izq_pct': get_float('grasa_pierna_izq_pct'),
+        'musculo_pierna_izq_pct': get_float('musculo_pierna_izq_pct'),
+    }
     
-    if peso and altura_m and altura_m > 0:
-        db_data['imc'] = round(peso / (altura_m * altura_m), 2)
+    if db_data['peso'] and db_data['altura'] and db_data['altura'] > 0:
+        db_data['imc'] = round(db_data['peso'] / (db_data['altura'] * db_data['altura']), 2)
     else:
         db_data['imc'] = None
 
-    # Calcular composición corporal
-    composicion_kg = _calculate_body_composition(request.form, peso)
+    composicion_kg = _calculate_body_composition(request.form, db_data['peso'])
     db_data.update(composicion_kg)
 
-    # Insertar en la base de datos
     db = get_db()
     cursor = db.cursor()
     
-    # Filtrar solo las columnas que existen en la tabla 'mediciones' para evitar errores
     cursor.execute("SHOW COLUMNS FROM mediciones")
     table_columns = {col[0] for col in cursor.fetchall()}
     
-    # Mantener solo los datos del formulario que corresponden a columnas de la tabla
     final_data = {k: v for k, v in db_data.items() if k in table_columns}
 
     columns = ', '.join([f'`{k}`' for k in final_data.keys()])
@@ -291,7 +290,6 @@ def ver_paciente(paciente_id):
         flash("Paciente no encontrado.", "danger")
         return redirect(url_for('index'))
     
-    # Lógica de permisos
     if session['user_rol'] == 'nutriologo' and paciente['id_nutriologo_asignado'] != session['user_id'] and paciente['id_nutriologo_asignado'] is not None:
         flash("No tienes permiso para ver este paciente.", "danger")
         return redirect(url_for('pacientes_dashboard'))
@@ -301,7 +299,6 @@ def ver_paciente(paciente_id):
     cursor.execute("SELECT * FROM historial_clinico WHERE id_paciente = %s", (paciente_id,))
     historial = cursor.fetchone() or {}
 
-    # Preparar datos para las gráficas
     chart_data = {
         "labels": [m['fecha_medicion'].strftime('%d-%m-%Y') for m in mediciones_asc],
         "peso": [float(m['peso']) for m in mediciones_asc if m.get('peso') is not None],
@@ -333,23 +330,19 @@ def editar_historial_clinico(paciente_id):
     if request.method == 'POST':
         form_data = {key: (val or None) for key, val in request.form.items()}
         
-        # Actualizar estatura en la tabla de pacientes si se proporcionó
         if form_data.get('estatura_cm'):
             cursor.execute("UPDATE pacientes SET estatura_cm = %s WHERE id = %s", (form_data['estatura_cm'], paciente_id))
         
-        # Preparar datos para la tabla de historial
-        form_data.pop('estatura_cm', None) # Quitar estatura para no insertarla en historial
+        form_data.pop('estatura_cm', None)
         
         cursor.execute("SELECT id FROM historial_clinico WHERE id_paciente = %s", (paciente_id,))
         existe = cursor.fetchone()
         
         if existe:
-            # Si ya existe un historial, se actualiza
             fields = ", ".join([f"`{key}`=%s" for key in form_data.keys()])
             sql = f"UPDATE historial_clinico SET {fields} WHERE id_paciente=%s"
             params = list(form_data.values()) + [paciente_id]
         else:
-            # Si no existe, se crea uno nuevo
             form_data["id_paciente"] = paciente_id
             keys = ", ".join([f'`{k}`' for k in form_data.keys()])
             values = ", ".join(['%s'] * len(form_data))
@@ -361,7 +354,6 @@ def editar_historial_clinico(paciente_id):
         flash('Historial clínico guardado exitosamente.', 'success')
         return redirect(url_for('ver_paciente', paciente_id=paciente_id))
 
-    # Lógica para el método GET
     cursor.execute("SELECT * FROM pacientes WHERE id = %s", (paciente_id,))
     paciente = cursor.fetchone()
     if not paciente:
