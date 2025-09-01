@@ -1,41 +1,64 @@
-<!-- ========== templates/admin_dashboard.html ========== -->
-{% extends "layout.html" %}
+{% extends "base.html" %}
 
-{% block title %}Dashboard del Administrador{% endblock %}
+{% block title %}Admin - Dashboard{% endblock %}
 
 {% block content %}
 <div class="space-y-8">
-    <!-- Sección de Gestión de Usuarios -->
-    <div class="bg-white p-6 rounded-xl shadow-md">
-        <h2 class="text-2xl font-bold mb-4 text-gray-800">Gestión de Usuarios</h2>
+    <!-- Panel de Control Principal -->
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center"><i class="fas fa-cogs text-gray-500 mr-3"></i>Panel de Control Principal</h2>
+        <div class="bg-gray-50 p-4 rounded-md">
+            <a href="{{ url_for('pacientes_dashboard') }}" class="block hover:bg-gray-100 p-4 rounded-lg transition-colors">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="font-semibold text-lg text-green-700"><i class="fas fa-users mr-2"></i>Gestión de Pacientes</h3>
+                        <p class="text-gray-600 text-sm">Consulta expedientes, reasigna profesionales y visualiza datos de todos los pacientes.</p>
+                    </div>
+                    <i class="fas fa-arrow-right text-gray-400"></i>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Gestión de Usuarios -->
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <h3 class="text-xl font-bold text-gray-800 mb-4"><i class="fas fa-users-cog mr-2"></i>Gestión de Usuarios</h3>
         <div class="overflow-x-auto">
             <table class="min-w-full bg-white">
-                <thead class="bg-gray-200">
+                <thead class="bg-gray-800 text-white">
                     <tr>
-                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">Nombre</th>
-                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">Email</th>
-                        <th class="py-3 px-4 text-center text-sm font-semibold text-gray-600">Rol</th>
-                        <th class="py-3 px-4 text-center text-sm font-semibold text-gray-600">Estado</th>
-                        <th class="py-3 px-4 text-center text-sm font-semibold text-gray-600">Acciones</th>
+                        <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Nombre</th>
+                        <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Email</th>
+                        <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Rol</th>
+                        <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Estado</th>
+                        <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="text-gray-700">
                     {% for user in usuarios %}
-                    <tr class="border-b hover:bg-gray-50">
+                    <tr class="border-b border-gray-200 hover:bg-gray-50">
                         <td class="py-3 px-4">{{ user.nombre }}</td>
                         <td class="py-3 px-4">{{ user.email }}</td>
-                        <td class="py-3 px-4 text-center">{{ user.rol|capitalize }}</td>
-                        <td class="py-3 px-4 text-center">
-                            <span class="text-xs font-medium px-2.5 py-0.5 rounded-full {{ 'bg-green-100 text-green-800' if user.estado == 'activo' else 'bg-red-100 text-red-800' }}">
-                                {{ user.estado|capitalize }}
-                            </span>
+                        <td class="py-3 px-4">
+                            <span class="bg-green-200 text-green-800 py-1 px-3 rounded-full text-xs">{{ user.rol|capitalize }}</span>
                         </td>
-                        <td class="py-3 px-4 text-center">
+                        <td class="py-3 px-4">
+                            {% if user.estado == 'activo' %}
+                                <span class="bg-blue-200 text-blue-800 py-1 px-3 rounded-full text-xs">Activo</span>
+                            {% else %}
+                                <span class="bg-red-200 text-red-800 py-1 px-3 rounded-full text-xs">Inactivo</span>
+                            {% endif %}
+                        </td>
+                        <td class="py-3 px-4">
                             <form method="POST" class="inline-block">
                                 {% if user.estado == 'activo' %}
-                                <button formaction="{{ url_for('update_user_status', user_id=user.id, new_status='inactivo') }}" class="bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-bold py-1 px-3 rounded-lg transition">Desactivar</button>
+                                    <button formaction="{{ url_for('update_user_status', user_id=user.id, new_status='inactivo') }}" class="bg-yellow-500 hover:bg-yellow-600 text-white text-xs font-bold py-2 px-3 rounded transition-colors">
+                                        <i class="fas fa-user-slash"></i> Desactivar
+                                    </button>
                                 {% else %}
-                                <button formaction="{{ url_for('update_user_status', user_id=user.id, new_status='activo') }}" class="bg-green-500 hover:bg-green-600 text-white text-sm font-bold py-1 px-3 rounded-lg transition">Activar</button>
+                                    <button formaction="{{ url_for('update_user_status', user_id=user.id, new_status='activo') }}" class="bg-green-500 hover:bg-green-600 text-white text-xs font-bold py-2 px-3 rounded transition-colors">
+                                        <i class="fas fa-user-check"></i> Activar
+                                    </button>
                                 {% endif %}
                             </form>
                         </td>
@@ -46,25 +69,25 @@
         </div>
     </div>
 
-    <!-- Sección de Últimos Inicios de Sesión -->
-    <div class="bg-white p-6 rounded-xl shadow-md">
-        <h2 class="text-2xl font-bold mb-4">Últimos Inicios de Sesión</h2>
-        <div class="overflow-x-auto">
+    <!-- Registros de Inicio de Sesión -->
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <h3 class="text-xl font-bold text-gray-800 mb-4"><i class="fas fa-history mr-2"></i>Registros de Inicio de Sesión</h3>
+        <div class="overflow-x-auto max-h-96">
             <table class="min-w-full bg-white">
-                <thead class="bg-gray-200">
+                <thead class="bg-gray-800 text-white sticky top-0">
                     <tr>
-                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">Fecha y Hora</th>
-                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">Usuario</th>
-                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">Rol</th>
-                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">Dirección IP</th>
+                        <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Fecha y Hora</th>
+                        <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Usuario</th>
+                        <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Rol</th>
+                        <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Dirección IP</th>
                     </tr>
                 </thead>
                 <tbody class="text-gray-700">
                     {% for log in logs %}
-                    <tr class="border-b hover:bg-gray-50">
-                        <td class="py-3 px-4">{{ log.fecha_hora.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <tr class="border-b border-gray-200 hover:bg-gray-50">
+                        <td class="py-3 px-4">{{ log.fecha_hora.strftime('%d-%m-%Y %H:%M:%S') }}</td>
                         <td class="py-3 px-4">{{ log.nombre }}</td>
-                        <td class="py-3 px-4">{{ log.rol }}</td>
+                        <td class="py-3 px-4">{{ log.rol|capitalize }}</td>
                         <td class="py-3 px-4">{{ log.ip_address }}</td>
                     </tr>
                     {% endfor %}

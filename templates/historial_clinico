@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Historial de {{ paciente.nombre_completo }}{% endblock %}
+
+{% block content %}
+<div class="bg-white p-6 md:p-8 rounded-xl shadow-lg">
+    <div class="flex flex-col md:flex-row justify-between md:items-center mb-6 border-b pb-4">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800">Historial Clínico-Nutricional</h1>
+            <p class="text-gray-600 mt-1">Paciente: <span class="font-semibold">{{ paciente.nombre_completo }}</span></p>
+        </div>
+        <a href="{{ url_for('ver_paciente', paciente_id=paciente.id) }}" class="mt-4 md:mt-0 text-sm text-green-600 hover:text-green-800 font-medium">&larr; Volver al Expediente</a>
+    </div>
+
+    <form action="{{ url_for('editar_historial_clinico', paciente_id=paciente.id) }}" method="POST" class="space-y-6">
+        
+        <!-- Acordeón de Secciones -->
+        <div class="space-y-4">
+            <!-- Sección 1: Información Personal -->
+            <details class="group border rounded-lg" open>
+                <summary class="flex items-center justify-between p-4 cursor-pointer bg-gray-50 rounded-t-lg font-semibold text-gray-700">
+                    Sección 1: Información Personal
+                    <i class="fas fa-chevron-down transition-transform duration-200 group-open:rotate-180"></i>
+                </summary>
+                <div class="p-6 border-t grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Nombre Completo</label>
+                        <input type="text" value="{{ paciente.nombre_completo }}" class="mt-1 w-full border-gray-300 rounded-md bg-gray-100 shadow-sm" readonly>
+                    </div>
+                    <div>
+                        <label for="edad" class="block text-sm font-medium text-gray-700">Edad</label>
+                        <input type="number" name="edad" id="edad" value="{{ historial.edad or '' }}" class="mt-1 w-full border-gray-300 rounded-md shadow-sm">
+                    </div>
+                    <div>
+                        <label for="estatura_cm" class="block text-sm font-medium text-gray-700">Estatura (cm)</label>
+                        <input type="number" step="0.1" name="estatura_cm" id="estatura_cm" value="{{ historial.estatura_cm or '' }}" class="mt-1 w-full border-gray-300 rounded-md shadow-sm">
+                    </div>
+                </div>
+            </details>
+
+            <!-- Sección 2: Objetivos y Estilo de Vida -->
+            <details class="group border rounded-lg">
+                <summary class="flex items-center justify-between p-4 cursor-pointer bg-gray-50 font-semibold text-gray-700">
+                    Sección 2: Objetivos y Estilo de Vida
+                    <i class="fas fa-chevron-down transition-transform duration-200 group-open:rotate-180"></i>
+                </summary>
+                <div class="p-6 border-t space-y-4">
+                    <div><label for="objetivo_principal" class="block text-sm font-medium text-gray-700">Objetivo Principal</label><textarea name="objetivo_principal" id="objetivo_principal" rows="3" class="mt-1 w-full border-gray-300 rounded-md shadow-sm">{{ historial.objetivo_principal or '' }}</textarea></div>
+                    <div><label for="actividad_diaria" class="block text-sm font-medium text-gray-700">Actividad Diaria (Trabajo, hobbies, etc.)</label><textarea name="actividad_diaria" id="actividad_diaria" rows="3" class="mt-1 w-full border-gray-300 rounded-md shadow-sm">{{ historial.actividad_diaria or '' }}</textarea></div>
+                    <div><label for="tiempo_entrenamiento" class="block text-sm font-medium text-gray-700">Tiempo disponible para entrenar (días/horas)</label><input type="text" name="tiempo_entrenamiento" id="tiempo_entrenamiento" value="{{ historial.tiempo_entrenamiento or '' }}" class="mt-1 w-full border-gray-300 rounded-md shadow-sm"></div>
+                </div>
+            </details>
+
+            <!-- El resto de las secciones seguirían este mismo patrón de <details> -->
+            <!-- ... -->
+
+        </div>
+
+        <div class="flex justify-end pt-6 border-t mt-8">
+            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
+                <i class="fas fa-save mr-2"></i>Guardar Historial Clínico
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

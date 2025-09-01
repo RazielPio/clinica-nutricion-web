@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-gray-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Clinigramm{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome para Iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+        }
+        /* Estilos para el scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #059669; /* dark-green */
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #047857;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+    <!-- Barra de Navegación Superior -->
+    <nav class="bg-gray-800 text-white shadow-md w-full z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <a href="{{ url_for('index') }}" class="flex-shrink-0 text-white font-bold text-xl flex items-center">
+                        <i class="fas fa-heartbeat text-green-400 mr-2"></i>
+                        <span>Clinigramm</span>
+                    </a>
+                </div>
+                {% if 'user_id' in session %}
+                <div class="hidden md:block">
+                    <div class="ml-4 flex items-center md:ml-6">
+                        <span class="text-gray-300 text-sm mr-4">
+                            Hola, <span class="font-medium text-white">{{ session.user_name }}</span> ({{ session.user_rol|capitalize }})
+                        </span>
+                        <a href="{{ url_for('logout') }}" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
+                            <i class="fas fa-sign-out-alt mr-1"></i>
+                            Cerrar Sesión
+                        </a>
+                    </div>
+                </div>
+                <div class="-mr-2 flex md:hidden">
+                    <button id="mobile-menu-button" type="button" class="bg-gray-800 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">Abrir menú principal</span>
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% if 'user_id' in session %}
+        <div class="md:hidden hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <div class="text-gray-300 text-sm px-3 py-2">
+                    Hola, <span class="font-medium text-white">{{ session.user_name }}</span>
+                </div>
+                <a href="{{ url_for('logout') }}" class="bg-red-600 hover:bg-red-700 text-white block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200">
+                    <i class="fas fa-sign-out-alt mr-1"></i>
+                    Cerrar Sesión
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </nav>
+
+    <!-- Contenido Principal -->
+    <main class="flex-grow w-full max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    {% set color = 'green' if category == 'success' else ('red' if category == 'danger' else ('blue' if category == 'info' else 'yellow')) %}
+                    <div class="bg-{{ color }}-100 border-l-4 border-{{ color }}-500 text-{{ color }}-700 p-4 mb-6 rounded-md shadow-sm" role="alert">
+                        <p>{{ message }}</p>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Pie de Página -->
+    <footer class="bg-gray-800 text-white w-full mt-auto">
+        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 text-center text-sm text-gray-400">
+            &copy; <span id="year"></span> Clinigramm. Todos los derechos reservados.
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        if (mobileMenuButton) {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

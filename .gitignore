@@ -14,6 +14,10 @@ __pycache__/
 .vscode/
 .idea/
 
+
 # Archivos de sistema operativo
 .DS_Store
 Thumbs.db
+
+#Ar
+config.py

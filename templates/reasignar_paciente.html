@@ -1,38 +1,49 @@
-<!-- ========== templates/reasignar_paciente.html ========== -->
-{% extends "layout.html" %}
+{% extends "base.html" %}
 
 {% block title %}Reasignar Paciente{% endblock %}
 
 {% block content %}
-<div class="max-w-xl mx-auto bg-white p-6 md:p-8 rounded-xl shadow-lg">
-    <div class="flex justify-between items-center mb-6">
-        <div>
-            <h1 class="text-2xl font-bold text-gray-800">Reasignar Paciente</h1>
-            <p class="text-gray-600">Estás editando a: <span class="font-semibold">{{ paciente.nombre_completo }}</span></p>
-        </div>
-        <a href="{{ url_for('ver_paciente', paciente_id=paciente.id) }}" class="text-sm text-blue-600 hover:underline">&larr; Volver al Expediente</a>
-    </div>
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white p-8 rounded-lg shadow-md">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+            <i class="fas fa-random text-gray-500 mr-3"></i>Reasignar Profesionales
+        </h2>
+        <p class="mb-6 text-gray-600">Paciente: <span class="font-semibold">{{ paciente.nombre_completo }}</span></p>
 
-    <form action="{{ url_for('reasignar_paciente', paciente_id=paciente.id) }}" method="POST">
-        <div class="space-y-4">
+        <form action="{{ url_for('update_assignments', paciente_id=paciente.id) }}" method="POST" class="space-y-6">
             <div>
-                <label for="id_nutriologo_asignado" class="block text-sm font-medium text-gray-700">Seleccionar Nuevo Nutriólogo</label>
-                <p class="text-xs text-gray-500 mb-2">Actualmente asignado a: {{ paciente.nutriologo_actual or 'Nadie' }}</p>
-                <select name="id_nutriologo_asignado" id="id_nutriologo_asignado" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500">
-                    <option value="">-- Dejar sin Asignar --</option>
+                <label for="id_nutriologo_asignado" class="block text-sm font-medium text-gray-700">Nutriólogo Asignado</label>
+                <select id="id_nutriologo_asignado" name="id_nutriologo_asignado" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm">
+                    <option value="null">-- Desasignar / Sin nutriólogo --</option>
                     {% for nutriologo in nutriologos %}
-                    <option value="{{ nutriologo.id }}" {% if paciente.id_nutriologo_asignado == nutriologo.id %}selected{% endif %}>
-                        {{ nutriologo.nombre }}
-                    </option>
+                        <option value="{{ nutriologo.id }}" {% if paciente.id_nutriologo_asignado == nutriologo.id %}selected{% endif %}>
+                            {{ nutriologo.nombre }}
+                        </option>
                     {% endfor %}
                 </select>
             </div>
-            <div class="flex justify-end pt-4">
-                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded-lg transition">
-                    Guardar Cambios
+            
+            <div>
+                <label for="id_entrenador_asignado" class="block text-sm font-medium text-gray-700">Entrenador Asignado</label>
+                <select id="id_entrenador_asignado" name="id_entrenador_asignado" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm">
+                    <option value="null">-- Desasignar / Sin entrenador --</option>
+                    {% for entrenador in entrenadores %}
+                        <option value="{{ entrenador.id }}" {% if paciente.id_entrenador_asignado == entrenador.id %}selected{% endif %}>
+                            {{ entrenador.nombre }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="flex items-center justify-end space-x-4 pt-4">
+                <a href="{{ url_for('pacientes_dashboard') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded transition-colors">
+                    Cancelar
+                </a>
+                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition-colors">
+                    <i class="fas fa-save mr-2"></i>Guardar Cambios
                 </button>
             </div>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
 {% endblock %}

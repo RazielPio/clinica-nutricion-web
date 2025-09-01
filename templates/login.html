@@ -1,36 +1,39 @@
-<!-- ========== templates/login.html (Corregido y con Logo Mejorado) ========== -->
-{% extends "layout.html" %}
+{% extends "base.html" %}
 
 {% block title %}Iniciar Sesión - Clinigramm{% endblock %}
 
 {% block content %}
-<div class="flex items-center justify-center min-h-screen -mt-24">
-    <div class="w-full max-w-md">
-        <div class="bg-white p-8 rounded-2xl shadow-lg">
-            
-            <!-- Opción 3: Logo Protagonista en la Pantalla de Login -->
-            <img class="h-20 w-auto mx-auto mb-6" 
-                 src="{{ url_for('static', filename='img/logo_clinica.png') }}" 
-                 onerror="this.onerror=null;this.src='https://placehold.co/200x80/ffffff/1f2937?text=CliniGramm';" 
-                 alt="Logo de Clinigramm">
+<div class="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8 bg-white p-10 rounded-xl shadow-lg">
+        <div>
+            <div class="text-center">
+                <i class="fas fa-heartbeat text-5xl text-green-600"></i>
+            </div>
+            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                Bienvenido a Clinigramm
+            </h2>
+            <p class="mt-2 text-center text-sm text-gray-600">
+                Inicia sesión para acceder a tu panel
+            </p>
+        </div>
+        <form class="mt-8 space-y-6" action="{{ url_for('login') }}" method="POST">
+            <div class="rounded-md shadow-sm -space-y-px">
+                <div>
+                    <label for="email" class="sr-only">Correo Electrónico</label>
+                    <input id="email" name="email" type="email" autocomplete="email" required class="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm" placeholder="Correo Electrónico">
+                </div>
+                <div>
+                    <label for="password" class="sr-only">Contraseña</label>
+                    <input id="password" name="password" type="password" autocomplete="current-password" required class="appearance-none rounded-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm" placeholder="Contraseña">
+                </div>
+            </div>
 
-            <h2 class="text-3xl font-bold text-center text-gray-800 mb-2">Bienvenido a Clinigramm</h2>
-            <p class="text-center text-gray-500 mb-8">Inicia sesión para continuar</p>
-            
-            <form method="POST" action="{{ url_for('login') }}">
-                <div class="mb-4">
-                    <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Correo Electrónico</label>
-                    <input type="email" name="email" id="email" class="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" required>
-                </div>
-                <div class="mb-6">
-                    <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Contraseña</label>
-                    <input type="password" name="password" id="password" class="w-full px-4 py-3 rounded-lg bg-gray-100 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" required>
-                </div>
-                <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:shadow-outline transition duration-300">
+            <div>
+                <button type="submit" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">
                     Iniciar Sesión
                 </button>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
 </div>
 {% endblock %}

@@ -1,38 +1,48 @@
-<!-- ========== templates/pacientes_dashboard.html ========== -->
-{% extends "layout.html" %}
+{% extends "base.html" %}
 
 {% block title %}Dashboard de Pacientes{% endblock %}
 
 {% block content %}
-<div class="bg-white p-6 rounded-xl shadow-md">
-    <h2 class="text-2xl font-bold mb-4 text-gray-800">Lista de Pacientes</h2>
+<div class="bg-white p-6 rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold text-gray-800 mb-2 flex items-center"><i class="fas fa-users text-gray-500 mr-3"></i>Listado General de Pacientes</h2>
+    <p class="text-gray-600 mb-6">
+        {% if session.user_rol == 'nutriologo' %}
+            Aquí puedes ver los pacientes que te han sido asignados y aquellos que aún no tienen un nutriólogo.
+        {% else %}
+            Vista completa de todos los pacientes registrados en el sistema.
+        {% endif %}
+    </p>
+
     <div class="overflow-x-auto">
         <table class="min-w-full bg-white">
-            <thead class="bg-gray-200">
+            <thead class="bg-gray-800 text-white">
                 <tr>
-                    <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">Nombre Completo</th>
-                    <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">Email</th>
-                    <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">Teléfono</th>
-                    <th class="py-3 px-4 text-left text-sm font-semibold text-gray-600">Nutriólogo Asignado</th>
-                    <th class="py-3 px-4 text-center text-sm font-semibold text-gray-600">Acciones</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Nombre Completo</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Nutriólogo Asignado</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Entrenador Asignado</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Acciones</th>
                 </tr>
             </thead>
             <tbody class="text-gray-700">
                 {% for paciente in pacientes %}
-                <tr class="border-b hover:bg-gray-50">
+                <tr class="border-b border-gray-200 hover:bg-gray-50">
                     <td class="py-3 px-4">{{ paciente.nombre_completo }}</td>
-                    <td class="py-3 px-4">{{ paciente.email or 'N/A' }}</td>
-                    <td class="py-3 px-4">{{ paciente.telefono or 'N/A' }}</td>
-                    <td class="py-3 px-4">{{ paciente.nutriologo_nombre or 'Sin Asignar' }}</td>
-                    <td class="py-3 px-4 text-center">
-                        <a href="{{ url_for('ver_paciente', paciente_id=paciente.id) }}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-3 rounded-lg transition">
-                            Ver Expediente
+                    <td class="py-3 px-4">{{ paciente.nutriologo_nombre or 'No asignado' }}</td>
+                    <td class="py-3 px-4">{{ paciente.entrenador_nombre or 'No asignado' }}</td>
+                    <td class="py-3 px-4 space-x-2">
+                        <a href="{{ url_for('ver_paciente', paciente_id=paciente.id) }}" class="bg-green-600 hover:bg-green-700 text-white text-xs font-bold py-2 px-3 rounded transition-colors inline-block">
+                            <i class="fas fa-eye"></i> Ver
                         </a>
+                        {% if session.user_rol == 'admin' %}
+                        <a href="{{ url_for('reasignar_paciente_page', paciente_id=paciente.id) }}" class="bg-gray-500 hover:bg-gray-600 text-white text-xs font-bold py-2 px-3 rounded transition-colors inline-block">
+                            <i class="fas fa-random"></i> Reasignar
+                        </a>
+                        {% endif %}
                     </td>
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="5" class="text-center py-4 text-gray-500">No hay pacientes registrados.</td>
+                    <td colspan="4" class="text-center py-4 text-gray-500">No hay pacientes para mostrar.</td>
                 </tr>
                 {% endfor %}
             </tbody>
